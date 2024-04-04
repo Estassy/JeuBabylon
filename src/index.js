@@ -25,16 +25,4 @@ window.onload = () => {
     // Ajoutez des gestionnaires pour les autres options de jeu et la logique pour "Entraînement" si nécessaire
 };
 
-/*
-  
-    document.getElementById("gameOption1").addEventListener("click", function() {
-        // Initialisez et démarrez le jeu correspondant à l'option 1
-        // game.init(paramètres spécifiques au jeu ou au niveau );
-        document.getElementById('gameSelectionMenu').style.display = 'none'; // Cachez le menu de sélection
-        canvas.style.display = 'block'; // Affichez le canvas
-        game.start();
-    });
 
-
-
-*/
