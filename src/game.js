@@ -64,6 +64,7 @@ class Game {
         });
 
     }
+    
 
     start() {
 
@@ -132,7 +133,16 @@ class Game {
         }
 
         if (this.actions["Space"]) {
-            //TODO jump
+            if (!this.isJumping) {
+                this.isJumping = true;
+                // Exemple simple de saut
+                this.player.position.y += 1; // Hauteur du saut
+                setTimeout(() => {
+                    this.player.position.y -= 1; // Retour au sol
+                    this.isJumping = false;
+                }, 500); // Durée du saut
+            }
+            this.actions["Space"] = false; // Reset l'action de saut
         }
     }
 

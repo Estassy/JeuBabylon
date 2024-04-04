@@ -32,4 +32,36 @@ window.onload = () => {
     });
 };
 
+
+
+// Création des managers
+let eventManager = new EventManager();
+let scoreManager = new ScoreManager();
+
+// Ajout des épreuves
+eventManager.addEvent(new Event("100m Sprint"));
+eventManager.addEvent(new Event("Long Jump"));
+eventManager.addEvent(new Event("High Jump"));
+
+// Démarrer la première épreuve
+eventManager.startNextEvent();
+
+// À la fin de l'épreuve, ajoutez le score
+scoreManager.addScore(eventManager.events[eventManager.currentEventIndex], 1); // Si le joueur est premier
+
+// Marquer l'épreuve comme complète et passer à la suivante
+eventManager.completeCurrentEvent();
+
+// Obtenir le score total
+let totalScore = scoreManager.getTotalScore();
+console.log(`Total score: ${totalScore}`);
+
+
+  <div id="loadingScreen" style="position: absolute; width: 100%; height: 100%; background: black; display: flex; justify-content: center; align-items: center;">
+    <div style="width: 50%; background: grey;">
+        <div id="loadingBar" style="height: 20px; width: 0%; background: green;"></div>
+    </div>
+    <p id="loadingText" style="color: white; margin-top: 20px;">Chargement...</p>
+  </div>
+
 */
