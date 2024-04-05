@@ -64,4 +64,6 @@ console.log(`Total score: ${totalScore}`);
     <p id="loadingText" style="color: white; margin-top: 20px;">Chargement...</p>
   </div>
 
+  État du jeu** : Implémentez un système d'état pour gérer différents états de jeu (par exemple, début, en cours, pause, fin). Cela rendra votre jeu plus structuré et facilitera l'ajout de nouvelles fonctionnalités.
+
 */

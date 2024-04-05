@@ -12,17 +12,38 @@ window.onload = () => {
         engine.resize();
     });
 
-    game = new Game(engine, canvas);
-
     document.getElementById("playGame").addEventListener("click", function() {
-        game.init();
-        document.querySelector('.menu').style.display = 'none';
-        canvas.style.display = 'block';
-        game.start();
+        // Afficher la modal de sélection de jeu
+        document.getElementById("gameSelectionModal").style.display = "block";
     });
 
-    
-    // Ajoutez des gestionnaires pour les autres options de jeu et la logique pour "Entraînement" si nécessaire
+    document.getElementById("chooseRunning").addEventListener("click", function() {
+        initializeGame("running");
+    });
+
+    // Ajouter des gestionnaires pour les autres jeux ici
 };
 
+function initializeGame(gameType) {
+    switch(gameType) {
+        case "running":
+            game = new Game(engine, canvas); // La classe Game actuelle est pour la course
+            break;
+        // Cas pour les autres jeux
+        // case "swimming":
+        //     game = new SwimmingGame(engine, canvas);
+        //     break;
+        // case "jumping":
+        //     game = new JumpingGame(engine, canvas);
+        //     break;
+    }
+    startGame();
+}
 
+function startGame() {
+    game.init();
+    document.querySelector('.menu').style.display = 'none';
+    document.getElementById("gameSelectionModal").style.display = "none";
+    canvas.style.display = 'block';
+    game.start();
+}

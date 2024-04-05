@@ -6,80 +6,26 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>BabylonJS Game</title>
   <link rel="icon" type="image/x-icon" href="./favicon.ico">
-  <style>
-    html,
-    body {
-      overflow: hidden;
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      background: url('./index.webp') no-repeat center center fixed;
-      background-size: cover;
-      /* Cover the entire window */
-    }
+  <link href="./style.css" rel="stylesheet">
 
-    #renderCanvas {
-      width: 100%;
-      height: 100%;
-      touch-action: none;
-      display: none;
-      /* Initially hide the canvas */
-    }
-
-    .menu {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .menu-button {
-      margin: 10px;
-      padding: 10px 20px;
-      font-size: 24px;
-      cursor: pointer;
-      background-color: #ffffffc0;
-      /* Semi-transparent white */
-      border: 2px solid #000;
-      border-radius: 5px;
-    }
-
-    #fps {
-      position: absolute;
-      background-color: black;
-      border: 2px solid red;
-      text-align: center;
-      font-size: 16px;
-      color: white;
-      top: 15px;
-      right: 10px;
-      width: 60px;
-      height: 20px;
-    }
-  </style>
 </head>
 
 <body>
   <div class="menu">
     <button id="playGame" class="menu-button">Jouer</button>
     <button id="trainingMode" class="menu-button">Entraînement</button>
-
   </div>
+
+  <div id="gameSelectionModal">
+    <h2>Choisir un Jeu</h2>
+    <button id="chooseRunning" class="button-game">Course</button>
+    <!-- Les boutons pour les autres jeux seront ajoutés ici une fois implémentés -->
+</div>
+
+
   <canvas id="renderCanvas" touch-action="none"></canvas>
   <div id="fps">0</div>
 
-
-
-  <!-- Place your BabylonJS Scripts here 
-  <script type="module" src="src/index.js"></script>
-  
-  -->
-  
-   
   </script>
 </body>
 
