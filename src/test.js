@@ -66,4 +66,7 @@ console.log(`Total score: ${totalScore}`);
 
   État du jeu** : Implémentez un système d'état pour gérer différents états de jeu (par exemple, début, en cours, pause, fin). Cela rendra votre jeu plus structuré et facilitera l'ajout de nouvelles fonctionnalités.
 
+
+
+
 */
