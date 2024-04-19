@@ -1,7 +1,9 @@
 
 import { Engine } from "@babylonjs/core";
-import Game from "./game";
+import Game from "./run/game";
 import JEU from "./sports/jeu";
+import Soccer from "./soccer/game";
+
 
 import JavelinScene from "./sports/JavelinScene";
 
@@ -33,6 +35,10 @@ window.onload = () => {
         initializeGame("javelou");
     });
 
+    document.getElementById("chooseSoccer").addEventListener("click", function () {
+        initializeGame("soccer");
+    });
+
     // Ajouter des gestionnaires pour les autres jeux ici
 };
 
@@ -51,6 +57,9 @@ function initializeGame(gameType) {
         case "javelou":
             game = new JavelinScene(canvas, engine); // Utilisez JavelinScene pour la gestion du lancer de javelot
             break;
+        case "soccer":
+            game = new Soccer(canvas, engine); // Utilisez JavelinScene pour la gestion du lancer de javelot
+            break;
         // Ajoutez d'autres jeux si nécessaire
     }
     startGame();
@@ -58,9 +67,12 @@ function initializeGame(gameType) {
 
 
 function startGame() {
-    game.init();
+    if (game && typeof game.init === 'function') {
+        game.init();  // Initialise le jeu si la méthode init est définie
+    }
     document.querySelector('.menu').style.display = 'none';
     document.getElementById("gameSelectionModal").style.display = "none";
     canvas.style.display = 'block';
-    game.start();
+    game.start();  // Démarre le jeu
 }
+

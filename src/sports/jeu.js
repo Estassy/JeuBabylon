@@ -4,7 +4,7 @@ import HavokPhysics from "@babylonjs/havok";
 
 import floorUrl from "../../assets/textures/floor.png";
 import floorBumpUrl from "../../assets/textures/floor_bump.png";
-import Player from "../player";
+import Player from "../run/player";
 
 
 class JEU {
