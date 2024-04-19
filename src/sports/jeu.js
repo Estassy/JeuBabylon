@@ -4,7 +4,7 @@ import HavokPhysics from "@babylonjs/havok";
 
 import floorUrl from "../../assets/textures/floor.png";
 import floorBumpUrl from "../../assets/textures/floor_bump.png";
-import Player from "../run/player";
+import Player from "./player";
 
 
 class JEU {
@@ -33,6 +33,7 @@ class JEU {
     constructor(canvas, engine) {
         this.#canvas = canvas;
         this.#engine = engine;
+        
     }
 
     async start() {
@@ -47,7 +48,10 @@ class JEU {
 
         const hk = new HavokPlugin(true, this.#havokInstance);
         // enable physics in the scene with a gravity
-        scene.enablePhysics(new Vector3(0, -9.81, 0), hk);        
+        scene.enablePhysics(new Vector3(0, -9.81, 0), hk);  
+        
+        this.#engine = new Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true });
+
         
         this.#gameCamera = new FollowCamera("camera1", new Vector3(0, 0, 0), scene);
         this.#gameCamera.heightOffset = 4;
