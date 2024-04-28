@@ -3,6 +3,10 @@ import { AdvancedDynamicTexture, TextBlock,StackPanel, Control } from "@babylonj
 
 import JavelinThrow from "./javelinThrow";
 
+import meshUrl from "../../assets/models/player.glb";
+import mountainUrl from "../../assets/models/mount_timpanogos_early_2017.glb";
+import roadTextureUrl from "../../assets/textures/dd719e47a144a8ed5f56999b21ffafeb.jpg";
+
 class JavelinScene {
     constructor(canvas, engine) {
         this.canvas = canvas;
@@ -35,7 +39,7 @@ class JavelinScene {
         // Configuration du sol avec une texture plus réaliste
         let ground = MeshBuilder.CreateGround("ground", { width: 50, height: 50 }, this.scene);
         let groundMaterial = new StandardMaterial("groundMat", this.scene);
-        let groundTexture = new Texture("path/to/realistic_ground_texture.jpg", this.scene);
+        let groundTexture = new Texture(roadTextureUrl, this.scene);
         groundTexture.uScale = 6; // Répétition de la texture sur l'axe U
         groundTexture.vScale = 6; // Répétition de la texture sur l'axe V
         groundMaterial.diffuseTexture = groundTexture;
@@ -62,14 +66,16 @@ class JavelinScene {
     }
 
     async loadPlayerModel() {
-        let res = await SceneLoader.ImportMeshAsync("", "../../assets/models/", "player.glb", this.scene);
+        console.log("Chargement du modèle :", meshUrl);
+        let res = await SceneLoader.ImportMeshAsync("", "", meshUrl, this.scene);
+        console.log("Modèle chargé :", res);
         let player = res.meshes[0];
         player.position = new Vector3(0, 0, 0);
         return player;
     }
 
     async loadEnvironment() {
-        let treeResult = await SceneLoader.ImportMeshAsync("", "../../assets/models/", "tree_model.glb", this.scene);
+        let treeResult = await SceneLoader.ImportMeshAsync("", "", mountainUrl, this.scene);
         let tree = treeResult.meshes[0];
         tree.position = new Vector3(-5, 0, 5);
         tree.scaling = new Vector3(2, 2, 2);
