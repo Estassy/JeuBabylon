@@ -39,6 +39,20 @@ window.onload = () => {
         initializeGame("soccer");
     });
 
+    document.getElementById("pauseButton").addEventListener("click", function () {
+        game.pause();
+    });
+
+    document.getElementById("resumeButton").addEventListener("click", function () {
+        game.resume();
+    });
+
+    document.getElementById("stopButton").addEventListener("click", function () {
+        game.stop();
+    });
+
+
+
     // Ajouter des gestionnaires pour les autres jeux ici
 };
 
@@ -70,6 +84,7 @@ function startGame() {
     if (game && typeof game.init === 'function') {
         game.init();  // Initialise le jeu si la méthode init est définie
     }
+    console.log("Début du jeu, activation des contrôles.");
     document.querySelector('.menu').style.display = 'none';
     document.getElementById("gameSelectionModal").style.display = "none";
     canvas.style.display = 'block';

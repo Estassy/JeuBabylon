@@ -65,7 +65,7 @@ class Game {
 
     }
     
-
+    /*
     start() {
 
         this.startTimer = 0;
@@ -79,6 +79,32 @@ class Game {
                 this.scene.render();
         });
     }
+    */
+    start() {
+        this.countdown(5, () => {
+            this.engine.runRenderLoop(() => {
+                let delta = this.engine.getDeltaTime() / 1000.0;
+    
+                this.updateMoves(delta);
+                this.update(delta);
+    
+                this.scene.render();
+            });
+        });
+    }
+    
+    countdown(seconds, callback) {
+        let counter = seconds;
+        const interval = setInterval(() => {
+            console.log(counter + ' secondes restantes');
+            counter--;
+            if (counter < 0) {
+                clearInterval(interval);
+                callback();
+            }
+        }, 1000);
+    }
+    
 
     update(delta) {
 
