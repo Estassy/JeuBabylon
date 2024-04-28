@@ -65,21 +65,6 @@ class Game {
 
     }
     
-    /*
-    start() {
-
-        this.startTimer = 0;
-        this.engine.runRenderLoop(() => {
-
-                let delta = this.engine.getDeltaTime() / 1000.0;
-
-                this.updateMoves(delta);
-                this.update(delta);
-
-                this.scene.render();
-        });
-    }
-    */
     start() {
         this.countdown(5, () => {
             this.engine.runRenderLoop(() => {
@@ -95,20 +80,33 @@ class Game {
     
     countdown(seconds, callback) {
         let counter = seconds;
+        const display = document.getElementById("countdownDisplay");
+        display.innerText = `Le jeu commence dans : ${counter} secondes`;
+        display.style.display = "block";
+    
         const interval = setInterval(() => {
             console.log(counter + ' secondes restantes');
             counter--;
+            display.innerText = `Le jeu commence dans : ${counter} secondes`;
             if (counter < 0) {
                 clearInterval(interval);
+                display.style.display = "none";
                 callback();
+                this.engine.resize();  // Force le redimensionnement du moteur après le compte à rebours
             }
         }, 1000);
     }
     
-
+    
+    
+    updateScore() {
+        const scoreCounter = document.getElementById("score");
+        scoreCounter.innerText = `Score: ${this.score}`;
+    }
+    
     update(delta) {
 
-
+        
         for (let i = 0; i < this.obstacles.length; i++) {
             let obstacle = this.obstacles[i];
 
@@ -125,7 +123,7 @@ class Game {
 
             }
         }
-
+      
 
         // this.tracks[lastIndex].position.y = Math.sin(this.startTimer*10 ) / 2;
         for (let i = 0; i < this.tracks.length; i++) {

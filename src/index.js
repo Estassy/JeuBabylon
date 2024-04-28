@@ -39,20 +39,6 @@ window.onload = () => {
         initializeGame("soccer");
     });
 
-    document.getElementById("pauseButton").addEventListener("click", function () {
-        game.pause();
-    });
-
-    document.getElementById("resumeButton").addEventListener("click", function () {
-        game.resume();
-    });
-
-    document.getElementById("stopButton").addEventListener("click", function () {
-        game.stop();
-    });
-
-
-
     // Ajouter des gestionnaires pour les autres jeux ici
 };
 
@@ -75,6 +61,10 @@ function initializeGame(gameType) {
             game = new Soccer(canvas, engine); // Utilisez JavelinScene pour la gestion du lancer de javelot
             break;
         // Ajoutez d'autres jeux si nécessaire
+        
+        default:
+            console.error("Type de jeu non reconnu:", gameType);
+            return;  // Sortie précoce en cas de type non reconnu
     }
     startGame();
 }

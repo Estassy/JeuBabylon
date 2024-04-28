@@ -8,13 +8,20 @@ body {
     background: url('./index.webp') no-repeat center center fixed;
     background-size: cover;
 }
-
+/*
 #renderCanvas {
     width: 100%;
     height: 100%;
     touch-action: none;
-    display: none; /* Initially hide the canvas */
+    display: none; 
 }
+*/
+#renderCanvas {
+    width: 100%;
+    height: 100%;
+    display: block; /* Assurez-vous que le canvas est bien affiché */
+}
+
 
 .menu {
     position: absolute;
