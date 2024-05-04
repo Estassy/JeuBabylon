@@ -16,6 +16,14 @@
     <button id="trainingMode" class="menu-button">Entraînement</button>
   </div>
 
+  
+  <div id="pauseMenu" style="display: none;">
+    <button id="resumeGame">Reprendre</button>
+    <button id="backToMenu">Retour au Menu</button>
+    <!-- Ajoute d'autres options si nécessaire -->
+  </div>
+
+
   <div id="gameSelectionModal">
     <h2>Choisir un Jeu</h2>
     <button id="chooseRunning" class="button-game">Course</button>
@@ -25,18 +33,19 @@
     <button id="chooseJavelo" class="button-game">Javelo</button>
 
     <button id="chooseSoccer" class="button-game">Soccer</button>
-    
+
     <!-- Les boutons pour les autres jeux seront ajoutés ici une fois implémentés -->
-</div>
-
-<div id="countdownDisplay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; color: white; display: none;">Le jeu commence dans : 5 secondes</div>
-
-<canvas id="renderCanvas" touch-action="none"></canvas>
-<div id="score">Score: 0</div>
+  </div>
 
 
+  <div id="countdownDisplay"
+    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; color: white; display: none;">
+    Le jeu commence dans : 5 secondes
+  </div>
 
-  </script>
+  <canvas id="renderCanvas" touch-action="none"></canvas>
+  <div id="score">Score: 0</div>
+
 </body>
 
 </html>

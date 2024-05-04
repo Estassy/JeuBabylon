@@ -1,6 +1,7 @@
 
 import { Engine } from "@babylonjs/core";
 import Game from "./run/game";
+import GameControlManager from "./run/game";
 import JEU from "./sports/jeu";
 import Soccer from "./soccer/game";
 
@@ -40,16 +41,51 @@ window.onload = () => {
     });
 
     // Ajouter des gestionnaires pour les autres jeux ici
+    document.getElementById("resumeGame").addEventListener("click", function() {
+        game.resume();
+        document.getElementById("pauseMenu").style.display = "none";
+    });
+    
+    document.getElementById("backToMenu").addEventListener("click", function() {
+        if (game && game.dispose) {
+            window.removeEventListener("keydown", handleEscape);
+            game.dispose();
+        }
+        document.querySelector('.menu').style.display = 'block';
+        document.getElementById("pauseMenu").style.display = "none";
+        canvas.style.display = 'none';
+    });   
+    
+    
 };
 
+
+function handleEscape(event) {
+    if (event.key === "Escape") {
+        const pauseMenu = document.getElementById("pauseMenu");
+        if (pauseMenu.style.display === "none") {
+            game.pause();  // Pause le jeu
+            pauseMenu.style.display = "block";  // Affiche le menu de pause
+        } else {
+            game.resume();  // Reprend le jeu
+            pauseMenu.style.display = "none";  // Cache le menu de pause
+        }
+    }
+}
+
+
+let currentGameController = null;
+
 function initializeGame(gameType) {
-    if (game && game.dispose) { // Assurez-vous de nettoyer la scène précédente si nécessaire
+    if (game && game.dispose) { // Assure-toi de nettoyer la scène précédente si nécessaire
+        window.removeEventListener("keydown", handleEscape); // Retire le gestionnaire précédent si nécessaire
         game.dispose();
     }
 
     switch (gameType) {
         case "running":
             game = new Game(engine, canvas); // La classe Game pour la course
+            window.addEventListener("keydown", handleEscape)
             break;
         case "jeu":
             game = new JEU(engine, canvas); // La classe JEU pour un autre type de jeu
@@ -58,16 +94,15 @@ function initializeGame(gameType) {
             game = new JavelinScene(canvas, engine); // Utilisez JavelinScene pour la gestion du lancer de javelot
             break;
         case "soccer":
-            game = new Soccer(canvas, engine); // Utilisez JavelinScene pour la gestion du lancer de javelot
+            game = new Soccer(canvas, engine); // Utilisez Soccer pour la gestion du soccer
             break;
-        // Ajoutez d'autres jeux si nécessaire
-        
         default:
             console.error("Type de jeu non reconnu:", gameType);
             return;  // Sortie précoce en cas de type non reconnu
     }
     startGame();
 }
+
 
 
 function startGame() {

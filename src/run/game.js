@@ -64,26 +64,26 @@ class Game {
         });
 
     }
-    
+
     start() {
         this.countdown(5, () => {
             this.engine.runRenderLoop(() => {
                 let delta = this.engine.getDeltaTime() / 1000.0;
-    
+
                 this.updateMoves(delta);
                 this.update(delta);
-    
+
                 this.scene.render();
             });
         });
     }
-    
+
     countdown(seconds, callback) {
         let counter = seconds;
         const display = document.getElementById("countdownDisplay");
         display.innerText = `Le jeu commence dans : ${counter} secondes`;
         display.style.display = "block";
-    
+
         const interval = setInterval(() => {
             console.log(counter + ' secondes restantes');
             counter--;
@@ -96,17 +96,17 @@ class Game {
             }
         }, 1000);
     }
-    
-    
-    
+
+
+
     updateScore() {
         const scoreCounter = document.getElementById("score");
         scoreCounter.innerText = `Score: ${this.score}`;
     }
-    
+
     update(delta) {
 
-        
+
         for (let i = 0; i < this.obstacles.length; i++) {
             let obstacle = this.obstacles[i];
 
@@ -123,7 +123,7 @@ class Game {
 
             }
         }
-      
+
 
         // this.tracks[lastIndex].position.y = Math.sin(this.startTimer*10 ) / 2;
         for (let i = 0; i < this.tracks.length; i++) {
@@ -227,9 +227,9 @@ class Game {
         res.meshes[0].rotation = new Vector3(0, 0, 0);
         res.animationGroups[0].stop();
         res.animationGroups[1].play(true);
-        
-        this.playerBox = MeshBuilder.CreateCapsule("playerCap", {width:0.4, height:1.7});
-        this.playerBox.position.y = 1.7/2;
+
+        this.playerBox = MeshBuilder.CreateCapsule("playerCap", { width: 0.4, height: 1.7 });
+        this.playerBox.position.y = 1.7 / 2;
         this.playerBox.parent = this.player;
         this.playerBox.checkCollisions = true;
         this.playerBox.collisionGroup = 1;
@@ -260,36 +260,36 @@ class Game {
 
 
         //let obstacleModele = MeshBuilder.CreateBox("obstacle", { width: 0.5, height: 1, depth: 1 }, this.scene);
-        res = await SceneLoader.ImportMeshAsync("", "", obstacle1Url, this.scene);        
+        res = await SceneLoader.ImportMeshAsync("", "", obstacle1Url, this.scene);
         let obstacleModele = res.meshes[0];
-        
-        
+
+
         for (let i = 0; i < NB_OBSTACLES; i++) {
             let obstacle = obstacleModele.clone("");
             obstacle.normalizeToUnitCube();
 
-            
+
             let w = Scalar.RandomRange(.5, 1.5);
             let d = Scalar.RandomRange(.5, 1.5);
             let h = Scalar.RandomRange(.5, 1.5);
             obstacle.scaling.set(w, h, d);
-            
+
             let x = Scalar.RandomRange(-TRACK_WIDTH / 2, TRACK_WIDTH / 2);
             let z = Scalar.RandomRange(SPAWN_POS_Z - 15, SPAWN_POS_Z + 15);
             obstacle.position.set(x, 0, z);
-            
+
             let childMeshes = obstacle.getChildMeshes();
 
             let min = childMeshes[0].getBoundingInfo().boundingBox.minimumWorld;
             let max = childMeshes[0].getBoundingInfo().boundingBox.maximumWorld;
-        
-            for(let i=0; i<childMeshes.length; i++){
+
+            for (let i = 0; i < childMeshes.length; i++) {
                 let mat = new StandardMaterial("mat", this.scene);
                 mat.emissiveColor = new Color4(.3, .3, Scalar.RandomRange(.5, .8));
                 mat.alpha = 0.5;
 
                 childMeshes[i].material = mat;
-        
+
                 let meshMin = childMeshes[i].getBoundingInfo().boundingBox.minimumWorld;
                 let meshMax = childMeshes[i].getBoundingInfo().boundingBox.maximumWorld;
 
@@ -311,6 +311,29 @@ class Game {
         this.music = new Sound("music", musicUrl, this.scene, undefined, { loop: true, autoplay: true, volume: 0.4 });
         this.aie = new Sound("aie", hitSoundUrl, this.scene);
 
+    }
+    pause() {
+        this.engine.stopRenderLoop();
+        if (this.music && this.music.isPlaying) {
+            this.music.pause();
+        }
+    }
+
+    resume() {
+        this.engine.runRenderLoop(() => this.scene.render());
+        if (this.music && !this.music.isPlaying) {
+            this.music.play();
+        }
+    }
+
+    dispose() {
+        if (this.scene) {
+            this.scene.dispose();
+        }
+        if (this.music) {
+            this.music.stop();
+            this.music.dispose();
+        }
     }
 }
 
