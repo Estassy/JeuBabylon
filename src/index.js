@@ -1,12 +1,8 @@
 
 import { Engine } from "@babylonjs/core";
 import Game from "./run/game";
-import GameControlManager from "./run/game";
-import JEU from "./sports/jeu";
+
 import Soccer from "./soccer/game";
-
-
-import JavelinScene from "./sports/JavelinScene";
 
 let engine;
 let canvas;
@@ -26,14 +22,6 @@ window.onload = () => {
 
     document.getElementById("chooseRunning").addEventListener("click", function () {
         initializeGame("running");
-    });
-
-    document.getElementById("chooseJeu").addEventListener("click", function () {
-        initializeGame("jeu");
-    });
-
-    document.getElementById("chooseJavelo").addEventListener("click", function () {
-        initializeGame("javelou");
     });
 
     document.getElementById("chooseSoccer").addEventListener("click", function () {
@@ -73,9 +61,6 @@ function handleEscape(event) {
     }
 }
 
-
-let currentGameController = null;
-
 function initializeGame(gameType) {
     if (game && game.dispose) { // Assure-toi de nettoyer la scène précédente si nécessaire
         window.removeEventListener("keydown", handleEscape); // Retire le gestionnaire précédent si nécessaire
@@ -86,12 +71,6 @@ function initializeGame(gameType) {
         case "running":
             game = new Game(engine, canvas); // La classe Game pour la course
             window.addEventListener("keydown", handleEscape)
-            break;
-        case "jeu":
-            game = new JEU(engine, canvas); // La classe JEU pour un autre type de jeu
-            break;
-        case "javelou":
-            game = new JavelinScene(canvas, engine); // Utilisez JavelinScene pour la gestion du lancer de javelot
             break;
         case "soccer":
             game = new Soccer(canvas, engine); // Utilisez Soccer pour la gestion du soccer

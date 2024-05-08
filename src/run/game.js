@@ -1,10 +1,8 @@
 import { BoundingInfo, Color3, Color4, DefaultRenderingPipeline, FreeCamera, HemisphericLight, KeyboardEventTypes, MeshBuilder, MotionBlurPostProcess, Scalar, Scene, SceneLoader, Sound, StandardMaterial, Texture, Vector3 } from "@babylonjs/core";
-import { Inspector } from "@babylonjs/inspector";
 
 const TRACK_WIDTH = 8;
 const TRACK_HEIGHT = 0.1;
 const TRACK_DEPTH = 3;
-const BORDER_HEIGHT = 0.5;
 const NB_TRACKS = 50;
 const NB_OBSTACLES = 10;
 const SPAWN_POS_Z = (TRACK_DEPTH * NB_TRACKS);
