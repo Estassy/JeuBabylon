@@ -1,4 +1,4 @@
-import { BoundingInfo, Color3, Color4, DefaultRenderingPipeline, FreeCamera, HemisphericLight, KeyboardEventTypes, MeshBuilder, MotionBlurPostProcess, Scalar, Scene, SceneLoader, Sound, StandardMaterial, Texture, Vector3 } from "@babylonjs/core";
+import { Color3, DefaultRenderingPipeline, FreeCamera, HemisphericLight, KeyboardEventTypes, MeshBuilder, MotionBlurPostProcess, Scalar, Scene, SceneLoader, Sound, StandardMaterial, Texture, Vector3 } from "@babylonjs/core";
 
 const TRACK_WIDTH = 8;
 const TRACK_HEIGHT = 0.1;
@@ -9,6 +9,7 @@ const SPAWN_POS_Z = (TRACK_DEPTH * NB_TRACKS);
 const SPEED_Z = 40;
 const SPEED_X = 10;
 
+
 import meshUrl from "../../assets/models/player.glb";
 import mountainUrl from "../../assets/models/mount_timpanogos_early_2017.glb";
 import roadTextureUrl from "../../assets/textures/dd719e47a144a8ed5f56999b21ffafeb.jpg";
@@ -17,6 +18,8 @@ import musicUrl from "../../assets/musics/Cyberpunk Moonlight Sonata v2.mp3";
 import hitSoundUrl from "../../assets/sounds/344033__reitanna__cute-impact.wav";
 
 import obstacle1Url from "../../assets/models/ice_cube.glb";
+import obstacle2Url from "../../assets/models/Box.glb";
+import obstacle3Url from "../../assets/models/Fox.glb";
 
 class Game {
 
@@ -34,12 +37,18 @@ class Game {
     inputMap = {};
     actions = {};
 
+    score = 100;
+    scoreDisplay;
+    obstacleTypes = [obstacle1Url, obstacle2Url];
+
     constructor(engine, canvas) {
         this.engine = engine;
         this.canvas = canvas;
+        this.scoreDisplay = document.getElementById("scoreDisplay");
     }
 
     init() {
+        this.initializeHUD();
         this.engine.displayLoadingUI();
         this.createScene().then(() => {
 
@@ -95,13 +104,6 @@ class Game {
         }, 1000);
     }
 
-
-
-    updateScore() {
-        const scoreCounter = document.getElementById("score");
-        scoreCounter.innerText = `Score: ${this.score}`;
-    }
-
     update(delta) {
 
 
@@ -109,14 +111,33 @@ class Game {
             let obstacle = this.obstacles[i];
 
             obstacle.position.z -= (SPEED_Z * delta);
+
             if (obstacle.position.z < 0) {
                 let x = Scalar.RandomRange(-TRACK_WIDTH / 2, TRACK_WIDTH / 2);
                 let z = Scalar.RandomRange(SPAWN_POS_Z - 15, SPAWN_POS_Z + 15);
                 obstacle.position.set(x, 0.5, z);
+                // Incrémenter le score chaque fois qu'un obstacle est évité
+                this.score += 10;
+                this.updateScore();
             } else {
 
                 if (this.playerBox.intersectsMesh(obstacle, false)) {
                     this.aie.play();
+                    // Diminuer le score en cas de collision
+                    this.score -= 5; // Diminuer le score
+                    if (this.score < 0) this.score = 0; // Empêcher le score de devenir négatif
+                    this.updateScore(); // Mettre à jour l'affichage du score
+
+                    // Réinitialiser la position de l'obstacle pour éviter une pénalité multiple pour le même obstacle
+                    let newX = Scalar.RandomRange(-TRACK_WIDTH / 2, TRACK_WIDTH / 2);
+                    let newZ = Scalar.RandomRange(SPAWN_POS_Z - 15, SPAWN_POS_Z + 15);
+                    obstacle.position.set(newX, 0.5, newZ);
+
+                    // Si le score atteint zéro, c'est game over
+                    if (this.score === 0) {
+                        this.endGame();
+                        return; // Arrêter la boucle d'actualisation
+                    }
                 }
 
             }
@@ -142,6 +163,7 @@ class Game {
         this.startTimer += delta;
     }
 
+
     updateMoves(delta) {
         if (this.inputMap["KeyA"]) {
             this.player.position.x -= SPEED_X * delta;
@@ -166,6 +188,54 @@ class Game {
             }
             this.actions["Space"] = false; // Reset l'action de saut
         }
+    }
+    endGame() {
+        // Arrêter la boucle de rendu
+        this.engine.stopRenderLoop();
+
+        // Afficher un message de perte
+        const gameOverMessage = document.createElement("div");
+        gameOverMessage.id = "gameOver";
+        gameOverMessage.style.position = "fixed";
+        gameOverMessage.style.top = "50%";
+        gameOverMessage.style.left = "50%";
+        gameOverMessage.style.transform = "translate(-50%, -50%)";
+        gameOverMessage.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+        gameOverMessage.style.color = "white";
+        gameOverMessage.style.padding = "20px";
+        gameOverMessage.style.fontSize = "24px";
+        gameOverMessage.style.borderRadius = "10px";
+        gameOverMessage.innerText = "Game Over! Cliquez pour recommencer.";
+        document.body.appendChild(gameOverMessage);
+
+        // Ajouter un écouteur d'événements pour redémarrer le jeu
+        gameOverMessage.addEventListener("click", () => {
+            // Retirer le message de perte
+            document.body.removeChild(gameOverMessage);
+
+            // Réinitialiser le jeu
+            this.resetGame();
+        });
+    }
+
+    resetGame() {
+        // Réinitialiser le score
+        this.score = 0;
+        this.updateScore();
+
+        // Réinitialiser la position du joueur
+        this.player.position.set(0, TRACK_HEIGHT / 2, 6);
+
+        // Réinitialiser les positions des obstacles
+        for (let i = 0; i < this.obstacles.length; i++) {
+            let obstacle = this.obstacles[i];
+            let x = Scalar.RandomRange(-TRACK_WIDTH / 2, TRACK_WIDTH / 2);
+            let z = Scalar.RandomRange(SPAWN_POS_Z - 15, SPAWN_POS_Z + 15);
+            obstacle.position.set(x, 0.5, z);
+        }
+
+        // Redémarrer la boucle de rendu
+        this.engine.runRenderLoop(() => this.scene.render());
     }
 
     async createScene() {
@@ -255,59 +325,14 @@ class Game {
         res.meshes[0].rotation = new Vector3(0, Math.PI / 2, 0);
         res.meshes[0].scaling = new Vector3(2, 2, 2);
 
+        //ici obst
 
-
-        //let obstacleModele = MeshBuilder.CreateBox("obstacle", { width: 0.5, height: 1, depth: 1 }, this.scene);
-        res = await SceneLoader.ImportMeshAsync("", "", obstacle1Url, this.scene);
-        let obstacleModele = res.meshes[0];
-
-
-        for (let i = 0; i < NB_OBSTACLES; i++) {
-            let obstacle = obstacleModele.clone("");
-            obstacle.normalizeToUnitCube();
-
-
-            let w = Scalar.RandomRange(.5, 1.5);
-            let d = Scalar.RandomRange(.5, 1.5);
-            let h = Scalar.RandomRange(.5, 1.5);
-            obstacle.scaling.set(w, h, d);
-
-            let x = Scalar.RandomRange(-TRACK_WIDTH / 2, TRACK_WIDTH / 2);
-            let z = Scalar.RandomRange(SPAWN_POS_Z - 15, SPAWN_POS_Z + 15);
-            obstacle.position.set(x, 0, z);
-
-            let childMeshes = obstacle.getChildMeshes();
-
-            let min = childMeshes[0].getBoundingInfo().boundingBox.minimumWorld;
-            let max = childMeshes[0].getBoundingInfo().boundingBox.maximumWorld;
-
-            for (let i = 0; i < childMeshes.length; i++) {
-                let mat = new StandardMaterial("mat", this.scene);
-                mat.emissiveColor = new Color4(.3, .3, Scalar.RandomRange(.5, .8));
-                mat.alpha = 0.5;
-
-                childMeshes[i].material = mat;
-
-                let meshMin = childMeshes[i].getBoundingInfo().boundingBox.minimumWorld;
-                let meshMax = childMeshes[i].getBoundingInfo().boundingBox.maximumWorld;
-
-
-                min = Vector3.Minimize(min, meshMin);
-                max = Vector3.Maximize(max, meshMax);
-            }
-            obstacle.setBoundingInfo(new BoundingInfo(min, max));
-
-            obstacle.showBoundingBox = false;
-            obstacle.checkCollisions = true;
-            obstacle.collisionGroup = 2;
-
-            this.obstacles.push(obstacle);
-        }
-        obstacleModele.dispose;
+        this.initializeObstacles();
 
 
         this.music = new Sound("music", musicUrl, this.scene, undefined, { loop: true, autoplay: true, volume: 0.4 });
         this.aie = new Sound("aie", hitSoundUrl, this.scene);
+        this.scoreDisplay = document.getElementById("scoreDisplay");
 
     }
     pause() {
@@ -333,6 +358,74 @@ class Game {
             this.music.dispose();
         }
     }
+    // Fonction d'initialisation des obstacles
+
+    initializeObstacles() {
+        for (let i = 0; i < NB_OBSTACLES; i++) {
+            let obstacleTypeUrl = this.obstacleTypes[Math.floor(Math.random() * this.obstacleTypes.length)];
+            SceneLoader.ImportMeshAsync("", "", obstacleTypeUrl, this.scene).then((res) => {
+                let obstacle = res.meshes[0];
+                obstacle.normalizeToUnitCube();
+                obstacle.scaling.set(
+                    Scalar.RandomRange(0.5, 1.5),
+                    Scalar.RandomRange(0.5, 1.5),
+                    Scalar.RandomRange(0.5, 1.5)
+                );
+
+
+
+                let x = Scalar.RandomRange(-TRACK_WIDTH / 2, TRACK_WIDTH / 2);
+
+                let z = Scalar.RandomRange(SPAWN_POS_Z - 50, SPAWN_POS_Z + 50); // Élargir la plage
+                let zOffset = Scalar.RandomRange(-5, 5); // Augmenter la variation sur l'axe z
+
+                obstacle.position.set(x, 0.5, z + zOffset)
+
+                obstacle.checkCollisions = true;
+                obstacle.collisionGroup = 2;
+                obstacle.rotation.y = Math.random() * Math.PI * 2; // Rotation aléatoire
+                this.obstacles.push(obstacle);
+
+                // Ajouter un mouvement latéral aléatoire
+                const amplitude = Scalar.RandomRange(0.1, 0.3);
+                const period = Scalar.RandomRange(2000, 5000);
+                // this.scene.registerBeforeRender(() => {
+                //     obstacle.position.x += amplitude * Math.sin(performance.now() / period);
+                // });
+                this.scene.registerBeforeRender(() => {
+                    let nextX = obstacle.position.x + amplitude * Math.sin(performance.now() / period);
+                    let nextY = 0.5 + 0.1 * Math.cos(performance.now() / period); // Mouvement vertical subtil
+                    obstacle.position.x = Math.max(Math.min(nextX, TRACK_WIDTH / 2), -TRACK_WIDTH / 2);
+                    obstacle.position.y = nextY;
+
+                    // Rotation aléatoire continue
+                    obstacle.rotation.y += 0.01; // Tourner légèrement à chaque frame
+                });
+
+
+            });
+        }
+    }
+
+
+    // Mise à jour du score
+    updateScore() {
+        this.scoreDisplay.innerText = `Score: ${this.score}`;
+    }
+    // Fonction d'initialisation du HUD
+    initializeHUD() {
+        // Assurez-vous d'avoir un élément `div` avec l'id `scoreDisplay`
+        let hud = document.createElement("div");
+        hud.id = "scoreDisplay";
+        hud.style.position = "fixed";
+        hud.style.top = "10px";
+        hud.style.left = "10px";
+        hud.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+        hud.style.color = "white";
+        hud.style.padding = "10px";
+        document.body.appendChild(hud);
+    }
+
 }
 
 export default Game;

@@ -32,17 +32,18 @@ window.onload = () => {
     document.getElementById("resumeGame").addEventListener("click", function() {
         game.resume();
         document.getElementById("pauseMenu").style.display = "none";
+        
     });
     
-    document.getElementById("backToMenu").addEventListener("click", function() {
-        if (game && game.dispose) {
-            window.removeEventListener("keydown", handleEscape);
-            game.dispose();
-        }
-        document.querySelector('.menu').style.display = 'block';
-        document.getElementById("pauseMenu").style.display = "none";
-        canvas.style.display = 'none';
-    });   
+    // document.getElementById("backToMenu").addEventListener("click", function() {
+    //     if (game && game.dispose) {
+    //         window.removeEventListener("keydown", handleEscape);
+    //         game.dispose();
+    //     }
+    //     document.querySelector('.menu').style.display = 'block';
+    //     document.getElementById("pauseMenu").style.display = "none";
+    //     canvas.style.display = 'none';
+    // });   
     
     
 };
