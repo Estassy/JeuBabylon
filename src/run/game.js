@@ -128,10 +128,10 @@ class Game {
                     if (this.score < 0) this.score = 0; // Empêcher le score de devenir négatif
                     this.updateScore(); // Mettre à jour l'affichage du score
 
-                    // Réinitialiser la position de l'obstacle pour éviter une pénalité multiple pour le même obstacle
-                    let newX = Scalar.RandomRange(-TRACK_WIDTH / 2, TRACK_WIDTH / 2);
-                    let newZ = Scalar.RandomRange(SPAWN_POS_Z - 15, SPAWN_POS_Z + 15);
-                    obstacle.position.set(newX, 0.5, newZ);
+                    // // Réinitialiser la position de l'obstacle pour éviter une pénalité multiple pour le même obstacle
+                    // let newX = Scalar.RandomRange(-TRACK_WIDTH / 2, TRACK_WIDTH / 2);
+                    // let newZ = Scalar.RandomRange(SPAWN_POS_Z - 15, SPAWN_POS_Z + 15);
+                    // obstacle.position.set(newX, 0.5, newZ);
 
                     // Si le score atteint zéro, c'est game over
                     if (this.score === 0) {
