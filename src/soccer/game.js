@@ -8,6 +8,7 @@ import floorBumpUrl from "../../assets/textures/floor_bump.png";
 import tvModelUrl from "../../assets/models/monitor.glb";
 
 import Player from "./player";
+import Bonus from "./bonus";
 import Arena from "./arena";
 import CurlingStone from "./curlingStone";
 import { GlobalManager, States } from "./globalmanager";
@@ -46,6 +47,13 @@ class Soccer {
         this.#canvas = canvas;
         this.#engine = engine;
         GlobalManager.init(canvas, engine);
+
+        // this.bonusManager = new Bonus(GlobalManager.scene);
+        // setInterval(() => {
+        //     if (!this.bonusManager.isActive) {
+        //         this.bonusManager.createBonus();
+        //     }
+        // }, 20000); // Try to create a bonus every 20 seconds
     }
 
     async start() {
@@ -309,7 +317,17 @@ class Soccer {
             InputController.resetActions();
             divFps.innerHTML = this.#engine.getFps().toFixed() + " fps";
             GlobalManager.scene.render();
+
+
+            // if (this.bonusManager.isActive) {
+            //     this.bonusManager.checkCollision(this.#player.gameObject);
+            // }
+
+            // GlobalManager.scene.render();
+
         });
+
+
     }
 
     updateGame(delta) {
