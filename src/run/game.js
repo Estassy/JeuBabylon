@@ -4,12 +4,16 @@ const TRACK_WIDTH = 8;
 const TRACK_HEIGHT = 0.1;
 const TRACK_DEPTH = 3;
 const NB_TRACKS = 50;
-const NB_OBSTACLES = 8;
+let NB_OBSTACLES = 10;
 const SPAWN_POS_Z = (TRACK_DEPTH * NB_TRACKS);
-const SPEED_Z = 30;
+let SPEED_Z = 30;
 const SPEED_X = 10;
- const MIN_Z_GAP = 20;  // Espacement minimal sur l'axe z entre deux obstacles
- const MAX_Z_GAP = 40;  // Espacement maximal sur l'axe z
+const MIN_Z_GAP = 20;  // Espacement minimal sur l'axe z entre deux obstacles
+const MAX_Z_GAP = 40;  // Espacement maximal sur l'axe z
+
+let currentLevel = 1;
+let levelThresholds = [100, 150, 200, 300, 400]; // Points nécessaires pour chaque niveau
+
 
 
 
@@ -107,9 +111,10 @@ class Game {
         }, 1000);
     }
 
-   
+
     initializeObstacles() {
         let lastZ = SPAWN_POS_Z;
+        console.log(NB_OBSTACLES)
         for (let i = 0; i < NB_OBSTACLES; i++) {
             let obstacleTypeUrl = this.obstacleTypes[Math.floor(Math.random() * this.obstacleTypes.length)];
             SceneLoader.ImportMeshAsync("", "", obstacleTypeUrl, this.scene).then((res) => {
@@ -145,6 +150,7 @@ class Game {
                 if (!obstacle.touched) {
                     this.score += 2;
                     this.updateScore();
+                    this.updateLevel();
                 }
                 // Réinitialiser l'obstacle
                 this.resetObstacle(obstacle);
@@ -155,9 +161,9 @@ class Game {
                 this.aie.play();
 
                 if (this.score === 0) {
-                this.endGame();
-                return; // Arrêter la boucle d'actualisation si le jeu se termine
-            }
+                    this.endGame();
+                    return; // Arrêter la boucle d'actualisation si le jeu se termine
+                }
             }
         });
 
@@ -169,19 +175,19 @@ class Game {
             if (track.position.z <= 0) {
                 let nextTrackIdx = (i + this.tracks.length - 1) % this.tracks.length;
                 track.position.z = this.tracks[nextTrackIdx].position.z + TRACK_DEPTH;
-            } 
+            }
         }
 
         this.startTimer += delta;
     }
-    
+
     resetObstacle(obstacle) {
         let x = Scalar.RandomRange(-TRACK_WIDTH / 2, TRACK_WIDTH / 2);
         let z = SPAWN_POS_Z + Scalar.RandomRange(MIN_Z_GAP, MAX_Z_GAP); // Assurez-vous que SPAWN_POS_Z est bien au-delà de la vue initiale du joueur
         obstacle.position.set(x, 0.5, z);
         obstacle.touched = false;
     }
-    
+
 
 
     updateMoves(delta) {
@@ -209,6 +215,25 @@ class Game {
             this.actions["Space"] = false; // Reset l'action de saut
         }
     }
+
+    updateLevel() {
+        if (currentLevel - 1 < levelThresholds.length && this.score >= levelThresholds[currentLevel - 1]) {
+            currentLevel++;
+            SPEED_Z += 10; // Augmenter la vitesse de base des obstacles à chaque niveau
+            NB_OBSTACLES += 4;
+            console.log(`Level Up! Welcome to Level ${currentLevel}`);
+            this.showLevelUpMessage(currentLevel); // Afficher le message de niveau sur l'écran
+        }
+    }
+
+    showLevelUpMessage(level) {
+        // Supposons que vous avez un élément HTML pour afficher les messages
+        const levelUpDiv = document.getElementById('levelUpMessage');
+        levelUpDiv.innerText = `Level ${level}!`;
+        levelUpDiv.style.display = 'block';
+        setTimeout(() => levelUpDiv.style.display = 'none', 3000); // Le message disparaît après 3 secondes
+    }
+
     endGame() {
         // Arrêter la boucle de rendu
         this.engine.stopRenderLoop();
