@@ -4,10 +4,13 @@ const TRACK_WIDTH = 8;
 const TRACK_HEIGHT = 0.1;
 const TRACK_DEPTH = 3;
 const NB_TRACKS = 50;
-const NB_OBSTACLES = 10;
+const NB_OBSTACLES = 8;
 const SPAWN_POS_Z = (TRACK_DEPTH * NB_TRACKS);
-const SPEED_Z = 40;
+const SPEED_Z = 30;
 const SPEED_X = 10;
+ const MIN_Z_GAP = 20;  // Espacement minimal sur l'axe z entre deux obstacles
+ const MAX_Z_GAP = 40;  // Espacement maximal sur l'axe z
+
 
 
 import meshUrl from "../../assets/models/player.glb";
@@ -73,7 +76,7 @@ class Game {
     }
 
     start() {
-        this.countdown(5, () => {
+        this.countdown(3, () => {
             this.engine.runRenderLoop(() => {
                 let delta = this.engine.getDeltaTime() / 1000.0;
 
@@ -104,64 +107,81 @@ class Game {
         }, 1000);
     }
 
-    update(delta) {
+   
+    initializeObstacles() {
+        let lastZ = SPAWN_POS_Z;
+        for (let i = 0; i < NB_OBSTACLES; i++) {
+            let obstacleTypeUrl = this.obstacleTypes[Math.floor(Math.random() * this.obstacleTypes.length)];
+            SceneLoader.ImportMeshAsync("", "", obstacleTypeUrl, this.scene).then((res) => {
+                let obstacle = res.meshes[0];
+                obstacle.normalizeToUnitCube();
+                obstacle.scaling.set(
+                    Scalar.RandomRange(0.5, 1.5),
+                    Scalar.RandomRange(0.5, 1.5),
+                    Scalar.RandomRange(0.5, 1.5)
+                );
 
-
-        for (let i = 0; i < this.obstacles.length; i++) {
-            let obstacle = this.obstacles[i];
-
-            obstacle.position.z -= (SPEED_Z * delta);
-
-            if (obstacle.position.z < 0) {
                 let x = Scalar.RandomRange(-TRACK_WIDTH / 2, TRACK_WIDTH / 2);
-                let z = Scalar.RandomRange(SPAWN_POS_Z - 15, SPAWN_POS_Z + 15);
+
+                // Générer le z avec un espacement contrôlé
+                let zGap = Scalar.RandomRange(MIN_Z_GAP, MAX_Z_GAP);
+                let z = lastZ + zGap;  // Positionner le prochain obstacle à 'zGap' unités derrière le dernier
+                lastZ = z;  // Mettre à jour la position z pour le prochain obstacle
+
                 obstacle.position.set(x, 0.5, z);
-                // Incrémenter le score chaque fois qu'un obstacle est évité
-                this.score += 10;
-                this.updateScore();
-            } else {
-
-                if (this.playerBox.intersectsMesh(obstacle, false)) {
-                    this.aie.play();
-                    // Diminuer le score en cas de collision
-                    this.score -= 5; // Diminuer le score
-                    if (this.score < 0) this.score = 0; // Empêcher le score de devenir négatif
-                    this.updateScore(); // Mettre à jour l'affichage du score
-
-                    // // Réinitialiser la position de l'obstacle pour éviter une pénalité multiple pour le même obstacle
-                    // let newX = Scalar.RandomRange(-TRACK_WIDTH / 2, TRACK_WIDTH / 2);
-                    // let newZ = Scalar.RandomRange(SPAWN_POS_Z - 15, SPAWN_POS_Z + 15);
-                    // obstacle.position.set(newX, 0.5, newZ);
-
-                    // Si le score atteint zéro, c'est game over
-                    if (this.score === 0) {
-                        this.endGame();
-                        return; // Arrêter la boucle d'actualisation
-                    }
-                }
-
-            }
+                obstacle.checkCollisions = true;
+                obstacle.collisionGroup = 2;
+                obstacle.rotation.y = Math.random() * Math.PI * 2; // Rotation aléatoire
+                this.obstacles.push(obstacle);
+            });
         }
+    }
 
 
-        // this.tracks[lastIndex].position.y = Math.sin(this.startTimer*10 ) / 2;
+    update(delta) {
+        this.obstacles.forEach(obstacle => {
+            obstacle.position.z -= SPEED_Z * delta;
+            if (obstacle.position.z < 0) {
+                if (!obstacle.touched) {
+                    this.score += 2;
+                    this.updateScore();
+                }
+                // Réinitialiser l'obstacle
+                this.resetObstacle(obstacle);
+            } else if (this.playerBox.intersectsMesh(obstacle, false) && !obstacle.touched) {
+                obstacle.touched = true;
+                this.score -= 5;
+                this.updateScore();
+                this.aie.play();
+
+                if (this.score === 0) {
+                this.endGame();
+                return; // Arrêter la boucle d'actualisation si le jeu se termine
+            }
+            }
+        });
+
+
+        // Mise à jour de la position des pistes
         for (let i = 0; i < this.tracks.length; i++) {
             let track = this.tracks[i];
             track.position.z -= SPEED_Z / 3 * delta;
-        }
-        for (let i = 0; i < this.tracks.length; i++) {
-            let track = this.tracks[i];
             if (track.position.z <= 0) {
                 let nextTrackIdx = (i + this.tracks.length - 1) % this.tracks.length;
-                //on le repositionne ET on le déplace aussi
                 track.position.z = this.tracks[nextTrackIdx].position.z + TRACK_DEPTH;
-                //track.position.y = Math.sin(this.startTimer*10 ) * TRACK_HEIGHT;
-
-            }
+            } 
         }
 
         this.startTimer += delta;
     }
+    
+    resetObstacle(obstacle) {
+        let x = Scalar.RandomRange(-TRACK_WIDTH / 2, TRACK_WIDTH / 2);
+        let z = SPAWN_POS_Z + Scalar.RandomRange(MIN_Z_GAP, MAX_Z_GAP); // Assurez-vous que SPAWN_POS_Z est bien au-delà de la vue initiale du joueur
+        obstacle.position.set(x, 0.5, z);
+        obstacle.touched = false;
+    }
+    
 
 
     updateMoves(delta) {
@@ -360,52 +380,7 @@ class Game {
     }
     // Fonction d'initialisation des obstacles
 
-    initializeObstacles() {
-        for (let i = 0; i < NB_OBSTACLES; i++) {
-            let obstacleTypeUrl = this.obstacleTypes[Math.floor(Math.random() * this.obstacleTypes.length)];
-            SceneLoader.ImportMeshAsync("", "", obstacleTypeUrl, this.scene).then((res) => {
-                let obstacle = res.meshes[0];
-                obstacle.normalizeToUnitCube();
-                obstacle.scaling.set(
-                    Scalar.RandomRange(0.5, 1.5),
-                    Scalar.RandomRange(0.5, 1.5),
-                    Scalar.RandomRange(0.5, 1.5)
-                );
 
-
-
-                let x = Scalar.RandomRange(-TRACK_WIDTH / 2, TRACK_WIDTH / 2);
-
-                let z = Scalar.RandomRange(SPAWN_POS_Z - 50, SPAWN_POS_Z + 50); // Élargir la plage
-                let zOffset = Scalar.RandomRange(-5, 5); // Augmenter la variation sur l'axe z
-
-                obstacle.position.set(x, 0.5, z + zOffset)
-
-                obstacle.checkCollisions = true;
-                obstacle.collisionGroup = 2;
-                obstacle.rotation.y = Math.random() * Math.PI * 2; // Rotation aléatoire
-                this.obstacles.push(obstacle);
-
-                // Ajouter un mouvement latéral aléatoire
-                const amplitude = Scalar.RandomRange(0.1, 0.3);
-                const period = Scalar.RandomRange(2000, 5000);
-                // this.scene.registerBeforeRender(() => {
-                //     obstacle.position.x += amplitude * Math.sin(performance.now() / period);
-                // });
-                this.scene.registerBeforeRender(() => {
-                    let nextX = obstacle.position.x + amplitude * Math.sin(performance.now() / period);
-                    let nextY = 0.5 + 0.1 * Math.cos(performance.now() / period); // Mouvement vertical subtil
-                    obstacle.position.x = Math.max(Math.min(nextX, TRACK_WIDTH / 2), -TRACK_WIDTH / 2);
-                    obstacle.position.y = nextY;
-
-                    // Rotation aléatoire continue
-                    obstacle.rotation.y += 0.01; // Tourner légèrement à chaque frame
-                });
-
-
-            });
-        }
-    }
 
 
     // Mise à jour du score
