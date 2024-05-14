@@ -3,7 +3,6 @@ const common = require('./webpack.common.js');
 const path = require('path');
 const fs = require('fs');
 
-// App directory
 const appDirectory = fs.realpathSync(process.cwd());
  
 module.exports = merge(common, {
