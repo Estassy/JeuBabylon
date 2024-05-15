@@ -26,7 +26,7 @@ import hitSoundUrl from "../../assets/sounds/344033__reitanna__cute-impact.wav";
 
 import obstacle1Url from "../../assets/models/ice_cube.glb";
 import obstacle2Url from "../../assets/models/Box.glb";
-import obstacle3Url from "../../assets/models/Fox.glb";
+
 
 class Game {
 
