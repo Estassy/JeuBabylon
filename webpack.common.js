@@ -2,6 +2,9 @@ const path = require("path");
 const fs = require("fs");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+
+
 
 const appDirectory = fs.realpathSync(process.cwd());
 
@@ -57,6 +60,10 @@ module.exports = {
                 ],
                 type: 'javascript/auto'
             },
+            {
+                test: /\.css$/i,
+                use: ['style-loader', 'css-loader'],
+            },
         ],
     },
     plugins: [
@@ -66,5 +73,12 @@ module.exports = {
             favicon: "public/favicon.ico",
             template: path.resolve(appDirectory, "public/index.html"),
         }),
+        new CopyWebpackPlugin({
+            patterns: [
+                { from: 'public/**/*.png', to: '[name][ext]' },
+                
+            ],
+        }),
+        
     ],
 };
