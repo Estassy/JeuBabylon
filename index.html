@@ -1,1 +1,106 @@
-<!doctype html><html lang="fr" xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BabylonJS Game</title><link rel="icon" type="image/x-icon" href="./favicon.ico"><link href="./style.css" rel="stylesheet"><link rel="icon" href="favicon.ico"><script defer="defer" src="js/babylonBundle.js"></script></head><body><div class="menu"><button id="playGame" class="menu-button">Jouer</button></div><div id="pauseMenu" style="display: none;"><button id="resumeGame">Reprendre</button> <button id="backToMenu">Retour au Menu</button></div><div id="gameSelectionModal"><h2>Choisir un Jeu</h2><button id="chooseRunning" class="button-game">Course</button> <button id="chooseSoccer" class="button-game">Soccer</button></div><div id="countdownDisplay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; color: white; display: none;">Le jeu commence dans : 5 secondes</div><canvas id="renderCanvas" touch-action="none"></canvas><div id="score">Score: 0</div><div id="levelUpMessage" style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 0, 0, 0.7); color: white; padding: 20px; display: none; font-size: 20px;"></div><div id="fps">0</div></body></html>
+<!doctype html><html lang="fr" xmlns="http://www.w3.org/1999/xhtml"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BabylonJS Game</title><link rel="icon" type="image/x-icon" href="./favicon.ico"><style>/* Styles généraux */
+body {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background: url('./index.png') no-repeat center center fixed;
+    background-size: cover;
+}
+
+#renderCanvas {
+    width: 100%;
+    height: 100%;
+    display: block; /* Assurez-vous que le canvas est bien affiché */
+}
+
+
+.menu {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.menu-button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 24px;
+    cursor: pointer;
+    background-color: #ffffffc0; /* Semi-transparent white */
+    border: 2px solid #000;
+    border-radius: 5px;
+}
+
+#fps {
+    position: absolute;
+    background-color: black;
+    border: 2px solid red;
+    text-align: center;
+    font-size: 16px;
+    color: white;
+    top: 15px;
+    right: 10px;
+    width: 60px;
+    height: 20px;
+}
+
+/* Modal de sélection du jeu */
+#gameSelectionModal {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: url('./background-modal.png') no-repeat center center;
+    background-size: cover;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    animation: fadeIn 0.5s ease-out;
+}
+
+#gameSelectionModal h2 {
+    color: #020202;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Boutons de jeu */
+.button-game {
+    display: block;
+    width: 200px;
+    padding: 10px;
+    margin: 10px auto;
+    font-size: 18px;
+    color: #000;
+    background: rgba#ffffffc0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button-game:hover {
+    background: rgba(0,0,0,0.7);
+}
+
+.button-game.running {
+    background: rgba(0,0,0,0.7); /* Assurez-vous de corriger le chemin si nécessaire */
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}</style><link rel="icon" href="favicon.ico"><script defer="defer" src="js/babylonBundle.js"></script></head><body><div class="menu"><button id="playGame" class="menu-button">Jouer</button></div><div id="pauseMenu" style="display: none;"><button id="resumeGame">Reprendre</button> <button id="backToMenu">Retour au Menu</button></div><div id="gameSelectionModal"><h2>Choisir un Jeu</h2><button id="chooseRunning" class="button-game">Course</button> <button id="chooseSoccer" class="button-game">Soccer</button></div><div id="countdownDisplay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; color: white; display: none;">Le jeu commence dans : 5 secondes</div><canvas id="renderCanvas" touch-action="none"></canvas><div id="score">Score: 0</div><div id="levelUpMessage" style="position: fixed; top: 20%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(0, 0, 0, 0.7); color: white; padding: 20px; display: none; font-size: 20px;"></div><div id="fps">0</div></body></html>
