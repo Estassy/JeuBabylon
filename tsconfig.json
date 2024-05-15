@@ -16,6 +16,10 @@
         "allowJs": true,
         "forceConsistentCasingInFileNames": true,
     },
+    "include": [
+        "src/**/*",
+        "externalFileTypes.d.ts"
+    ],
     "exclude": [
         "node_modules/**/*",
         "dist/**/*",
