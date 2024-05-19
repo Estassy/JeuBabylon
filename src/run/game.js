@@ -12,7 +12,7 @@ const MIN_Z_GAP = 20;  // Espacement minimal sur l'axe z entre deux obstacles
 const MAX_Z_GAP = 40;  // Espacement maximal sur l'axe z
 
 let currentLevel = 1;
-let levelThresholds = [100, 150, 200, 300, 400]; // Points nécessaires pour chaque niveau
+let levelThresholds = [100, 150, 200, 250, 300]; // Points nécessaires pour chaque niveau
 
 
 
@@ -113,9 +113,13 @@ class Game {
 
 
     initializeObstacles() {
-        let lastZ = SPAWN_POS_Z;
-        console.log(NB_OBSTACLES)
-        for (let i = 0; i < NB_OBSTACLES; i++) {
+        this.addObstacles(NB_OBSTACLES);
+    }
+    
+
+    addObstacles(count) {
+        let lastZ = this.obstacles.length > 0 ? this.obstacles[this.obstacles.length - 1].position.z : SPAWN_POS_Z;
+        for (let i = 0; i < count; i++) {
             let obstacleTypeUrl = this.obstacleTypes[Math.floor(Math.random() * this.obstacleTypes.length)];
             SceneLoader.ImportMeshAsync("", "", obstacleTypeUrl, this.scene).then((res) => {
                 let obstacle = res.meshes[0];
@@ -125,22 +129,62 @@ class Game {
                     Scalar.RandomRange(0.5, 1.5),
                     Scalar.RandomRange(0.5, 1.5)
                 );
-
+    
                 let x = Scalar.RandomRange(-TRACK_WIDTH / 2, TRACK_WIDTH / 2);
-
-                // Générer le z avec un espacement contrôlé
                 let zGap = Scalar.RandomRange(MIN_Z_GAP, MAX_Z_GAP);
-                let z = lastZ + zGap;  // Positionner le prochain obstacle à 'zGap' unités derrière le dernier
-                lastZ = z;  // Mettre à jour la position z pour le prochain obstacle
-
-                obstacle.position.set(x, 0.5, z);
+                let z = lastZ + zGap;
+                lastZ = z;
+    
+                //obstacle.position.set(x, 0.5, z);
+                obstacle.position.set(x, this.playerBox.position.y, z); // Ajuster la hauteur
                 obstacle.checkCollisions = true;
-                obstacle.collisionGroup = 2;
-                obstacle.rotation.y = Math.random() * Math.PI * 2; // Rotation aléatoire
+                obstacle.rotation.y = Math.random() * Math.PI * 2;
                 this.obstacles.push(obstacle);
             });
         }
     }
+    updateObstacles(delta) {
+        this.obstacles.forEach(obstacle => {
+            // Rendre les obstacles dynamiques à partir du niveau 4
+            if (currentLevel >= 4) {
+                // Exemple de mouvement horizontal
+                obstacle.position.x += Math.sin(this.startTimer + obstacle.uniqueId) * 0.05;
+            }
+    
+            obstacle.position.z -= SPEED_Z * delta;
+    
+            if (obstacle.position.z < 0) {
+                if (!obstacle.touched) {
+                    let points = (currentLevel >= 4) ? 1 : 2; // Réduire les points gagnés à partir du niveau 4
+                    this.score += points;
+                    this.updateScore();
+                    this.updateLevel();
+                }
+                this.resetObstacle(obstacle);
+            } else if (this.playerBox.intersectsMesh(obstacle, false) && !obstacle.touched) {
+                obstacle.touched = true;
+                let penalty = (currentLevel >= 4) ? 10 : 5; // Augmenter la pénalité à partir du niveau 4
+                this.score -= penalty;
+                this.updateScore();
+                this.aie.play();
+    
+                if (this.score <= 0) {
+                    this.endGame();
+                    return;
+                }
+            }
+        });
+    }
+    
+
+    resetObstacle(obstacle) {
+        let x = Scalar.RandomRange(-TRACK_WIDTH / 2, TRACK_WIDTH / 2);
+        let z = SPAWN_POS_Z + Scalar.RandomRange(MIN_Z_GAP, MAX_Z_GAP); // Assurez-vous que SPAWN_POS_Z est bien au-delà de la vue initiale du joueur
+        //obstacle.position.set(x, 0.5, z);
+        obstacle.position.set(x, this.playerBox.position.y, z); // Ajuster la hauteur
+        obstacle.touched = false;
+    }
+    
 
 
     update(delta) {
@@ -181,14 +225,7 @@ class Game {
         this.startTimer += delta;
     }
 
-    resetObstacle(obstacle) {
-        let x = Scalar.RandomRange(-TRACK_WIDTH / 2, TRACK_WIDTH / 2);
-        let z = SPAWN_POS_Z + Scalar.RandomRange(MIN_Z_GAP, MAX_Z_GAP); // Assurez-vous que SPAWN_POS_Z est bien au-delà de la vue initiale du joueur
-        obstacle.position.set(x, 0.5, z);
-        obstacle.touched = false;
-    }
-
-
+   
 
     updateMoves(delta) {
         if (this.inputMap["KeyA"]) {
@@ -220,11 +257,12 @@ class Game {
         if (currentLevel - 1 < levelThresholds.length && this.score >= levelThresholds[currentLevel - 1]) {
             currentLevel++;
             SPEED_Z += 10; // Augmenter la vitesse de base des obstacles à chaque niveau
-            NB_OBSTACLES += 4;
+            this.addObstacles(3);
             console.log(`Level Up! Welcome to Level ${currentLevel}`);
             this.showLevelUpMessage(currentLevel); // Afficher le message de niveau sur l'écran
         }
     }
+    
 
     showLevelUpMessage(level) {
         // Supposons que vous avez un élément HTML pour afficher les messages
