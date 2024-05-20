@@ -59,6 +59,9 @@ class Game {
         this.engine.displayLoadingUI();
         this.createScene().then(() => {
 
+            this.showCountdownAndInstructions(); //la
+            
+
             this.scene.onKeyboardObservable.add((kbInfo) => {
                 switch (kbInfo.type) {
                     case KeyboardEventTypes.KEYDOWN:
@@ -74,12 +77,15 @@ class Game {
             });
             this.engine.hideLoadingUI();
 
-            //qdqdInspector.Show(this.scene, {});
         });
 
     }
 
     start() {
+        this.showCountdownAndInstructions(); // Appel de la fonction pour afficher le compte à rebours et les instructions
+    }
+
+    showCountdownAndInstructions() {
         this.countdown(3, () => {
             this.engine.runRenderLoop(() => {
                 let delta = this.engine.getDeltaTime() / 1000.0;
@@ -92,24 +98,38 @@ class Game {
         });
     }
 
+
     countdown(seconds, callback) {
         let counter = seconds;
         const display = document.getElementById("countdownDisplay");
-        display.innerText = `Le jeu commence dans : ${counter} secondes`;
+        const instruction = document.getElementById("instructionDisplay");
+    
+        display.innerText = `Le jeu démarre dans: ${counter} secondes`;
         display.style.display = "block";
-
+        instruction.style.display = "none";
+    
         const interval = setInterval(() => {
             console.log(counter + ' secondes restantes');
             counter--;
-            display.innerText = `Le jeu commence dans : ${counter} secondes`;
+            display.innerText = `Le jeu démarre dans: ${counter} secondes`;
             if (counter < 0) {
                 clearInterval(interval);
                 display.style.display = "none";
-                callback();
-                this.engine.resize();  // Force le redimensionnement du moteur après le compte à rebours
+                instruction.innerText = `Appuyez sur "Espace" pour démarrer. Utilisez "Échap" pour arrêter.`;
+                instruction.style.display = "block";
+                
+                // Écouter l'événement de la touche "Espace" pour démarrer le jeu
+                window.addEventListener("keydown", function startGame(event) {
+                    if (event.code === "Space") {
+                        instruction.style.display = "none";
+                        callback();
+                        window.removeEventListener("keydown", startGame);
+                    }
+                });
             }
         }, 1000);
     }
+    
 
 
     initializeObstacles() {
@@ -323,7 +343,6 @@ class Game {
 
     async createScene() {
 
-        // This creates a basic Babylon Scene object (non-mesh)
         this.scene = new Scene(this.engine);
         this.scene.clearColor = new Color3(0.7, 0.7, 0.95);
         this.scene.ambientColor = new Color3(0.8, 0.8, 1);
@@ -334,17 +353,12 @@ class Game {
         this.scene.collisionsEnabled = true;
         this.scene.gravity = new Vector3(0, -0.15, 0);
 
-
-        // This creates and positions a free camera (non-mesh)
         this.camera = new FreeCamera("camera1", new Vector3(0, 3.8, 0), this.scene);
 
-        // This targets the camera to scene origin
         this.camera.setTarget(new Vector3(0, 3, 3));
 
-        // This attaches the camera to the canvas
         this.camera.attachControl(this.canvas, true);
 
-        // Set up new rendering pipeline
         var pipeline = new DefaultRenderingPipeline("default", true, this.scene, [this.camera]);
 
         pipeline.glowLayerEnabled = true;
@@ -352,26 +366,16 @@ class Game {
         pipeline.glowLayer.blurKernelSize = 16;
         pipeline.glowLayer.ldrMerge = true;
 
-
-        // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
         var light = new HemisphericLight("light", new Vector3(0, 1, 0), this.scene);
 
-        // Default intensity is 1. Let's dim the light a small amount
         light.intensity = 0.7;
 
-        // Finally create the motion blur effect :)
         var mb = new MotionBlurPostProcess('mb', this.scene, 1.0, this.camera);
         mb.motionStrength = 1;
 
-        // Our built-in 'ground' shape.
-        //var ground = MeshBuilder.CreateGround("ground", {width: 6, height: 6}, scene);
-
-
         let res = await SceneLoader.ImportMeshAsync("", "", meshUrl, this.scene);
 
-        // Set the target of the camera to the first imported mesh
         this.player = res.meshes[0];
-        //mb.excludeSkinnedMesh(this.player);
         res.meshes[0].name = "Player";
         res.meshes[0].scaling = new Vector3(1, 1, 1);
         res.meshes[0].position.set(0, TRACK_HEIGHT / 2, 6);
@@ -385,8 +389,6 @@ class Game {
         this.playerBox.checkCollisions = true;
         this.playerBox.collisionGroup = 1;
         this.playerBox.visibility = 0;
-        //this.playerBox.showBoundingBox = true;
-
 
         let mainTrack = MeshBuilder.CreateBox("trackmiddle", { width: TRACK_WIDTH, height: TRACK_HEIGHT, depth: TRACK_DEPTH });
         mainTrack.position = new Vector3(0, 0, 0);
@@ -402,22 +404,19 @@ class Game {
         mainTrack.dispose();
 
         res = await SceneLoader.ImportMeshAsync("", "", mountainUrl, this.scene);
-        // Set the target of the camera to the first imported mesh
+
         res.meshes[0].name = "mountain";
         res.meshes[0].position = new Vector3(-18, -31.3, 123.2);
         res.meshes[0].rotation = new Vector3(0, Math.PI / 2, 0);
         res.meshes[0].scaling = new Vector3(2, 2, 2);
 
-        //ici obst
-
         this.initializeObstacles();
-
 
         this.music = new Sound("music", musicUrl, this.scene, undefined, { loop: true, autoplay: true, volume: 0.4 });
         this.aie = new Sound("aie", hitSoundUrl, this.scene);
         this.scoreDisplay = document.getElementById("scoreDisplay");
-
     }
+
     pause() {
         this.engine.stopRenderLoop();
         if (this.music && this.music.isPlaying) {
@@ -441,10 +440,6 @@ class Game {
             this.music.dispose();
         }
     }
-    // Fonction d'initialisation des obstacles
-
-
-
 
     // Mise à jour du score
     updateScore() {
