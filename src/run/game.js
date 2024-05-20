@@ -12,7 +12,7 @@ const MIN_Z_GAP = 20;  // Espacement minimal sur l'axe z entre deux obstacles
 const MAX_Z_GAP = 40;  // Espacement maximal sur l'axe z
 
 let currentLevel = 1;
-let levelThresholds = [100, 150, 200, 250, 300]; // Points nécessaires pour chaque niveau
+let levelThresholds = [100, 150, 400, 600, 1000]; // Points nécessaires pour chaque niveau
 
 
 
@@ -104,33 +104,39 @@ class Game {
         const display = document.getElementById("countdownDisplay");
         const instruction = document.getElementById("instructionDisplay");
     
-        display.innerText = `Le jeu démarre dans: ${counter} secondes`;
+        const updateDisplay = () => {
+            display.innerText = `Le jeu démarre dans: ${counter} secondes`;
+        };
+    
+        updateDisplay();
         display.style.display = "block";
         instruction.style.display = "none";
     
         const interval = setInterval(() => {
             console.log(counter + ' secondes restantes');
             counter--;
-            display.innerText = `Le jeu démarre dans: ${counter} secondes`;
-            if (counter < 0) {
+            if (counter >= 0) {
+                updateDisplay();
+            } else {
                 clearInterval(interval);
                 display.style.display = "none";
                 instruction.innerText = `Appuyez sur "Espace" pour démarrer. Utilisez "Échap" pour arrêter.`;
                 instruction.style.display = "block";
                 
                 // Écouter l'événement de la touche "Espace" pour démarrer le jeu
-                window.addEventListener("keydown", function startGame(event) {
+                const startGame = (event) => {
                     if (event.code === "Space") {
                         instruction.style.display = "none";
                         callback();
                         window.removeEventListener("keydown", startGame);
                     }
-                });
+                };
+                window.addEventListener("keydown", startGame);
             }
         }, 1000);
     }
     
-
+    
 
     initializeObstacles() {
         this.addObstacles(NB_OBSTACLES);
@@ -276,8 +282,8 @@ class Game {
     updateLevel() {
         if (currentLevel - 1 < levelThresholds.length && this.score >= levelThresholds[currentLevel - 1]) {
             currentLevel++;
-            SPEED_Z += 10; // Augmenter la vitesse de base des obstacles à chaque niveau
-            this.addObstacles(3);
+            SPEED_Z += 5; // Augmenter la vitesse de base des obstacles à chaque niveau
+            this.addObstacles(10);
             console.log(`Level Up! Welcome to Level ${currentLevel}`);
             this.showLevelUpMessage(currentLevel); // Afficher le message de niveau sur l'écran
         }
