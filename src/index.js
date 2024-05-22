@@ -22,6 +22,7 @@ window.onload = () => {
     });
 
     setupGameSelectors();
+    setupReturnToMainMenu(); 
     setupPauseManagement();
 };
 
@@ -34,17 +35,35 @@ function setupGameSelectors() {
     document.getElementById("chooseSoccer").addEventListener("click", () => initializeGame("soccer"));
 }
 
-function setupPauseManagement() {
-    document.getElementById("resumeGame").addEventListener("click", () => {
-        if (game && typeof game.resume === 'function') {
-            game.resume();
-            document.getElementById("pauseMenu").style.display = "none";
-        }
-    });
 
+function setupReturnToMainMenu() {
+    document.getElementById("backToMenu").addEventListener("click", returnToMainMenu);
+}
+
+// Fonction pour retourner au menu principal
+function returnToMainMenu() {
+    if (game && typeof game.endGame === 'function') {
+        game.endGame();
+    }
+    // Rediriger vers le menu principal ou la page d'accueil
+    window.location.href = "/"; // Modifie cette ligne selon l'URL de ton menu principal
+}
+
+// Gestionnaire d'événements pour la gestion de la pause
+function setupPauseManagement() {
+    document.getElementById("resumeGame").addEventListener("click", resumeGameClicked);
     window.addEventListener("keydown", handleEscape);
 }
 
+// Fonction appelée lorsque le bouton "Reprendre" est cliqué
+function resumeGameClicked() {
+    if (game && typeof game.resume === 'function') {
+        game.resume();
+        document.getElementById("pauseMenu").style.display = "none";
+    }
+}
+
+// Fonction appelée lorsqu'on appuie sur la touche "Échap"
 function handleEscape(event) {
     if (event.key === "Escape") {
         const pauseMenu = document.getElementById("pauseMenu");
@@ -52,14 +71,10 @@ function handleEscape(event) {
             game.pause();
             pauseMenu.style.display = "block";
         } else {
-            if (game && typeof game.resume === 'function') {
-                game.resume();
-                pauseMenu.style.display = "none";
-            }
+            resumeGameClicked(); // Reprendre le jeu si le menu de pause est déjà caché
         }
     }
 }
-
 
 function initializeGame(gameType) {
     if (game && typeof game.dispose === 'function') {
