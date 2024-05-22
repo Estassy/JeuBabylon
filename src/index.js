@@ -42,9 +42,9 @@ function setupReturnToMainMenu() {
 
 // Fonction pour retourner au menu principal
 function returnToMainMenu() {
-    if (game && typeof game.endGame === 'function') {
-        game.endGame();
-    }
+    // if (game && typeof game.endGame === 'function') {
+    //     game.endGame();
+    // }
     // Rediriger vers le menu principal ou la page d'accueil
     window.location.href = "/"; // Modifie cette ligne selon l'URL de ton menu principal
 }
