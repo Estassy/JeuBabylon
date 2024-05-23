@@ -6,13 +6,13 @@ const TRACK_DEPTH = 3;
 const NB_TRACKS = 50;
 let NB_OBSTACLES = 10;
 const SPAWN_POS_Z = (TRACK_DEPTH * NB_TRACKS);
-let SPEED_Z = 30;
+let SPEED_Z = 20;
 const SPEED_X = 10;
 const MIN_Z_GAP = 20;  // Espacement minimal sur l'axe z entre deux obstacles
 const MAX_Z_GAP = 40;  // Espacement maximal sur l'axe z
 
 let currentLevel = 1;
-let levelThresholds = [100, 150, 400, 600, 1000]; // Points nécessaires pour chaque niveau
+let levelThresholds = [100, 150, 400, 700, 1200]; // Points nécessaires pour chaque niveau
 
 
 
@@ -283,7 +283,7 @@ class Game {
         if (currentLevel - 1 < levelThresholds.length && this.score >= levelThresholds[currentLevel - 1]) {
             currentLevel++;
             SPEED_Z += 5; // Augmenter la vitesse de base des obstacles à chaque niveau
-            this.addObstacles(10);
+            this.addObstacles(8);
             console.log(`Level Up! Welcome to Level ${currentLevel}`);
             this.showLevelUpMessage(currentLevel); // Afficher le message de niveau sur l'écran
         }
