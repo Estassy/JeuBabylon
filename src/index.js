@@ -46,7 +46,17 @@ function returnToMainMenu() {
     //     game.endGame();
     // }
     // Rediriger vers le menu principal ou la page d'accueil
-    window.location.href = "/"; // Modifie cette ligne selon l'URL de ton menu principal
+    
+    window.location.href = "./index.html"; // Modifie cette ligne selon l'URL de ton menu principal
+
+}
+
+// Fonction pour mettre le jeu en pause
+function pauseGame() {
+    if (game && typeof game.pause === 'function') {
+        game.pause();
+        document.getElementById("pauseMenu").style.display = "block";
+    }
 }
 
 // Gestionnaire d'événements pour la gestion de la pause
@@ -54,6 +64,14 @@ function setupPauseManagement() {
     document.getElementById("resumeGame").addEventListener("click", resumeGameClicked);
     window.addEventListener("keydown", handleEscape);
 }
+
+// Gestion de la touche "Échap"
+function handleEscape(event) {
+    if (event.key === "Escape") {
+        pauseGame();
+    }
+}
+
 
 // Fonction appelée lorsque le bouton "Reprendre" est cliqué
 function resumeGameClicked() {
@@ -63,18 +81,6 @@ function resumeGameClicked() {
     }
 }
 
-// Fonction appelée lorsqu'on appuie sur la touche "Échap"
-function handleEscape(event) {
-    if (event.key === "Escape") {
-        const pauseMenu = document.getElementById("pauseMenu");
-        if (pauseMenu.style.display === "none" && game && typeof game.pause === 'function') {
-            game.pause();
-            pauseMenu.style.display = "block";
-        } else {
-            resumeGameClicked(); // Reprendre le jeu si le menu de pause est déjà caché
-        }
-    }
-}
 
 function initializeGame(gameType) {
     if (game && typeof game.dispose === 'function') {

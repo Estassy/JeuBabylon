@@ -13,6 +13,7 @@ const MAX_Z_GAP = 40;  // Espacement maximal sur l'axe z
 
 let currentLevel = 1;
 let levelThresholds = [100, 150, 400, 700, 1200]; // Points nécessaires pour chaque niveau
+const levelSpeedIncrements = [5, 10, 15, 20, 25];
 
 
 
@@ -44,7 +45,7 @@ class Game {
     inputMap = {};
     actions = {};
 
-    score = 100;
+    score = 51;
     scoreDisplay;
     obstacleTypes = [obstacle1Url, obstacle2Url];
 
@@ -87,42 +88,45 @@ class Game {
 
     showCountdownAndInstructions() {
         this.countdown(3, () => {
-            this.engine.runRenderLoop(() => {
-                let delta = this.engine.getDeltaTime() / 1000.0;
-
-                this.updateMoves(delta);
-                this.update(delta);
-
-                this.scene.render();
-            });
+            // La fonction de rappel est appelée après la fin du compte à rebours
+            this.startGameLoop(); // Commencer la boucle de rendu après le compte à rebours
         });
     }
-
-
+    
+    startGameLoop() {
+        this.engine.runRenderLoop(() => {
+            let delta = this.engine.getDeltaTime() / 1000.0;
+    
+            this.updateMoves(delta);
+            this.update(delta);
+    
+            this.scene.render();
+        });
+    }
+    
     countdown(seconds, callback) {
         let counter = seconds;
         const display = document.getElementById("countdownDisplay");
         const instruction = document.getElementById("instructionDisplay");
     
         const updateDisplay = () => {
-            display.innerText = `Le jeu démarre dans: ${counter} secondes`;
+            display.innerText = `Le jeu démarre dans : ${counter} secondes`;
         };
     
-        updateDisplay();
         display.style.display = "block";
         instruction.style.display = "none";
     
-        const interval = setInterval(() => {
-            console.log(counter + ' secondes restantes');
-            counter--;
+        const runCountdown = () => {
             if (counter >= 0) {
                 updateDisplay();
+                console.log(counter + ' secondes restantes');
+                counter--;
+                setTimeout(runCountdown, 1000);
             } else {
-                clearInterval(interval);
                 display.style.display = "none";
                 instruction.innerText = `Appuyez sur "Espace" pour démarrer. Utilisez "Échap" pour arrêter.`;
                 instruction.style.display = "block";
-                
+    
                 // Écouter l'événement de la touche "Espace" pour démarrer le jeu
                 const startGame = (event) => {
                     if (event.code === "Space") {
@@ -133,11 +137,13 @@ class Game {
                 };
                 window.addEventListener("keydown", startGame);
             }
-        }, 1000);
+        };
+    
+        runCountdown(); // Appel initial pour démarrer le compte à rebours
     }
     
     
-
+    
     initializeObstacles() {
         this.addObstacles(NB_OBSTACLES);
     }
@@ -161,8 +167,8 @@ class Game {
                 let z = lastZ + zGap;
                 lastZ = z;
     
-                //obstacle.position.set(x, 0.5, z);
-                obstacle.position.set(x, this.playerBox.position.y, z); // Ajuster la hauteur
+                let obstacleHeight = 0.3;
+                obstacle.position.set(x, obstacleHeight, z); // Ajuster la hauteur
                 obstacle.checkCollisions = true;
                 obstacle.rotation.y = Math.random() * Math.PI * 2;
                 this.obstacles.push(obstacle);
@@ -194,7 +200,7 @@ class Game {
                 this.updateScore();
                 this.aie.play();
     
-                if (this.score <= 0) {
+                if (this.score < 1) {
                     this.endGame();
                     return;
                 }
@@ -206,8 +212,8 @@ class Game {
     resetObstacle(obstacle) {
         let x = Scalar.RandomRange(-TRACK_WIDTH / 2, TRACK_WIDTH / 2);
         let z = SPAWN_POS_Z + Scalar.RandomRange(MIN_Z_GAP, MAX_Z_GAP); // Assurez-vous que SPAWN_POS_Z est bien au-delà de la vue initiale du joueur
-        //obstacle.position.set(x, 0.5, z);
-        obstacle.position.set(x, this.playerBox.position.y, z); // Ajuster la hauteur
+        let obstacleHeight = 0.3;
+        obstacle.position.set(x, obstacleHeight, z); // Ajuster la hauteur
         obstacle.touched = false;
     }
     
@@ -230,7 +236,7 @@ class Game {
                 this.updateScore();
                 this.aie.play();
 
-                if (this.score === 0) {
+                if (this.score < 1) {
                     this.endGame();
                     return; // Arrêter la boucle d'actualisation si le jeu se termine
                 }
@@ -282,8 +288,10 @@ class Game {
     updateLevel() {
         if (currentLevel - 1 < levelThresholds.length && this.score >= levelThresholds[currentLevel - 1]) {
             currentLevel++;
-            SPEED_Z += 5; // Augmenter la vitesse de base des obstacles à chaque niveau
-            this.addObstacles(8);
+            let n = 1
+            n += 2
+            SPEED_Z += 2; // Augmenter la vitesse de base des obstacles à chaque niveau
+            this.addObstacles(8 + n);
             console.log(`Level Up! Welcome to Level ${currentLevel}`);
             this.showLevelUpMessage(currentLevel); // Afficher le message de niveau sur l'écran
         }
@@ -296,55 +304,6 @@ class Game {
         levelUpDiv.innerText = `Level ${level}!`;
         levelUpDiv.style.display = 'block';
         setTimeout(() => levelUpDiv.style.display = 'none', 3000); // Le message disparaît après 3 secondes
-    }
-
-    endGame() {
-        // Arrêter la boucle de rendu
-        this.engine.stopRenderLoop();
-
-        // Afficher un message de perte
-        const gameOverMessage = document.createElement("div");
-        gameOverMessage.id = "gameOver";
-        gameOverMessage.style.position = "fixed";
-        gameOverMessage.style.top = "50%";
-        gameOverMessage.style.left = "50%";
-        gameOverMessage.style.transform = "translate(-50%, -50%)";
-        gameOverMessage.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
-        gameOverMessage.style.color = "white";
-        gameOverMessage.style.padding = "20px";
-        gameOverMessage.style.fontSize = "24px";
-        gameOverMessage.style.borderRadius = "10px";
-        gameOverMessage.innerText = "Game Over! Cliquez pour recommencer.";
-        document.body.appendChild(gameOverMessage);
-
-        // Ajouter un écouteur d'événements pour redémarrer le jeu
-        gameOverMessage.addEventListener("click", () => {
-            // Retirer le message de perte
-            document.body.removeChild(gameOverMessage);
-
-            // Réinitialiser le jeu
-            this.resetGame();
-        });
-    }
-
-    resetGame() {
-        // Réinitialiser le score
-        this.score = 0;
-        this.updateScore();
-
-        // Réinitialiser la position du joueur
-        this.player.position.set(0, TRACK_HEIGHT / 2, 6);
-
-        // Réinitialiser les positions des obstacles
-        for (let i = 0; i < this.obstacles.length; i++) {
-            let obstacle = this.obstacles[i];
-            let x = Scalar.RandomRange(-TRACK_WIDTH / 2, TRACK_WIDTH / 2);
-            let z = Scalar.RandomRange(SPAWN_POS_Z - 15, SPAWN_POS_Z + 15);
-            obstacle.position.set(x, 0.5, z);
-        }
-
-        // Redémarrer la boucle de rendu
-        this.engine.runRenderLoop(() => this.scene.render());
     }
 
     async createScene() {
@@ -464,6 +423,58 @@ class Game {
         hud.style.padding = "10px";
         document.body.appendChild(hud);
     }
+
+    endGame() {
+        // Arrêter la boucle de rendu
+        this.engine.stopRenderLoop();
+    
+        // Afficher un message de perte
+        let gameOverMessage = document.getElementById("gameOver");
+        if (!gameOverMessage) {
+            gameOverMessage = document.createElement("div");
+            gameOverMessage.id = "gameOver";
+            gameOverMessage.style.position = "fixed";
+            gameOverMessage.style.top = "50%";
+            gameOverMessage.style.left = "50%";
+            gameOverMessage.style.transform = "translate(-50%, -50%)";
+            gameOverMessage.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+            gameOverMessage.style.color = "white";
+            gameOverMessage.style.padding = "20px";
+            gameOverMessage.style.fontSize = "24px";
+            gameOverMessage.style.borderRadius = "10px";
+            gameOverMessage.innerText = "Game Over! Cliquez pour recommencer.";
+            document.body.appendChild(gameOverMessage);
+    
+            // Ajouter un écouteur d'événements pour redémarrer le jeu
+            gameOverMessage.addEventListener("click", () => {
+                // Retirer le message de perte
+                document.body.removeChild(gameOverMessage);
+    
+                // Réinitialiser le jeu
+                this.resetGame();
+            });
+        }
+    }
+    
+
+    resetGame() {
+        // Réinitialiser le score
+        this.score = 0;
+        this.updateScore();
+    
+        // Réinitialiser la position du joueur
+        this.player.position.set(0, TRACK_HEIGHT / 2, 6);
+        // Reprendre la musique si elle était en pause
+        if (this.music && !this.music.isPlaying) {
+            this.music.play();
+        }
+
+        // Redémarrer la boucle de rendu si elle n'est pas déjà en cours
+    if (!this.engine.activeRenderLoops.length) {
+        this.start()
+    }
+    }
+    
 
 }
 
