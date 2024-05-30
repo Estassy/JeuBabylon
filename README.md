@@ -9,14 +9,36 @@
 ## Description du projet
 Notre projet, "Au Sommet de l'Excellence: Jeux Olympiques en Action", est un ensemble de deux jeux interactifs développés avec le moteur 3D Babylon.js. Ces jeux sont conçus pour offrir une expérience immersive à travers des simulations sportives utilisant des technologies avancées.
 
-Voici une proposition de modification :
-
 ### Comment Lancer le Jeu
 Pour créer une copie du projet ou le télécharger et le lancer avec npm start, suivez ces étapes :
 1. Clonez le projet depuis le dépôt Git ou téléchargez-le.
 2. Assurez-vous d'avoir npm installé sur votre système.
 3. Exécutez `npm install` dans le répertoire du projet pour installer toutes les dépendances.
 4. Lancez le jeu en exécutant `npm start`.
+5. Ouvrez un navigateur web et accédez à l'adresse `http://localhost...`
+
+### Contrôles des Jeux
+
+#### Premier Jeu: Défis Sportifs Olympiques
+
+Dans ce jeu, les joueurs doivent naviguer à travers différents obstacles pour gagner des points et monter de niveau. Les contrôles sont les suivants :
+
+- **Q** : Déplacement vers la gauche.
+- **D** : Déplacement vers la droite.
+- **Espace** : Saut.
+
+#### Deuxième Jeu: Soccer - Simulation de Curling avec Physique Avancée
+
+Dans ce jeu, les joueurs contrôlent des pierres de curling pour marquer dans des zones adverses, avec des interactions physiques réalistes. Les contrôles sont les suivants :
+
+- **Z** : Déplacement vers le haut.
+- **Q** : Déplacement vers la gauche.
+- **D** : Déplacement vers la droite.
+- **S** : Déplacement vers le bas.
+
+---
+
+Avec ces informations, les joueurs auront une référence claire sur la manière de contrôler leurs personnages dans chaque jeu. Cela peut aider à améliorer l'expérience utilisateur et à réduire la confusion lors de la première utilisation du jeu.
 
 **Accédez à notre collection de jeux "Au Sommet de l'Excellence" et jouez directement depuis votre navigateur en cliquant sur le lien suivant :**
 - [**Lancer le Jeu**](https://estassy.github.io/JeuBabylon/)
