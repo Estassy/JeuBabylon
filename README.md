@@ -85,12 +85,13 @@ Dans "Soccer: Jeu de Simulation de Curling", exploitez stratégie et précision 
 - **Graphismes et Éclairages Avancés** : Des visuels époustouflants et une gestion des lumières sophistiquée pour un rendu visuel captivant.
 - **Interface Adaptative** : Une interface qui évolue avec les phases du jeu, intuitive et réactive aux actions du joueur.
 
+
 ### Vidéo de Démonstration
 Découvrez "Soccer" en action et voyez comment maîtriser les pierres de curling pour devenir le champion de l'arène :
-- [Voir la vidéo de gameplay pour "Soccer"](./screenshots/Jeu2.mp4)
+- [Voir la vidéo de gameplay pour "Soccer"](https://drive.google.com/file/d/1it6ANha0-hApMK4Lv52tS77nWaLf4Nn5/view?usp=sharing)
 
 ### Captures d'Écran
-![Capture1](./screenshots/jeu2-1.png) ![Capture2](https://drive.google.com/file/d/1it6ANha0-hApMK4Lv52tS77nWaLf4Nn5/view?usp=sharing)
+![Capture1](./screenshots/jeu2-1.png) ![Capture2](./screenshots/jeu2-2.png)
 
 ## Vidéos Bonus
 - **Présentation de l'Équipe :** [Voir la vidéo](lien-vers-youtube-presentation)
