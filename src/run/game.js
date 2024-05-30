@@ -45,7 +45,7 @@ class Game {
     inputMap = {};
     actions = {};
 
-    score = 51;
+    score = 120;
     scoreDisplay;
     obstacleTypes = [obstacle1Url, obstacle2Url];
 
@@ -61,7 +61,7 @@ class Game {
         this.createScene().then(() => {
 
             this.showCountdownAndInstructions(); //la
-            
+
 
             this.scene.onKeyboardObservable.add((kbInfo) => {
                 switch (kbInfo.type) {
@@ -92,37 +92,34 @@ class Game {
             this.startGameLoop(); // Commencer la boucle de rendu après le compte à rebours
         });
     }
-    
+
     startGameLoop() {
         this.engine.runRenderLoop(() => {
             let delta = this.engine.getDeltaTime() / 1000.0;
-    
+
             this.updateMoves(delta);
             this.update(delta);
-    
+
             this.scene.render();
         });
     }
-    
+
     countdown(seconds, callback) {
         let counter = seconds;
         const display = document.getElementById("countdownDisplay");
         const instruction = document.getElementById("instructionDisplay");
     
         const updateDisplay = () => {
-            display.innerText = `Le jeu démarre dans : ${counter} secondes`;
+            display.innerText = `Le jeu démarre dans : ${counter} seconde(s)`;
         };
     
-        display.style.display = "block";
-        instruction.style.display = "none";
-    
         const runCountdown = () => {
-            if (counter >= 0) {
-                updateDisplay();
-                console.log(counter + ' secondes restantes');
+            updateDisplay();
+            
+            if (counter > 0) {
                 counter--;
-                setTimeout(runCountdown, 1000);
             } else {
+                clearInterval(intervalId);
                 display.style.display = "none";
                 instruction.innerText = `Appuyez sur "Espace" pour démarrer. Utilisez "Échap" pour arrêter.`;
                 instruction.style.display = "block";
@@ -139,15 +136,16 @@ class Game {
             }
         };
     
-        runCountdown(); // Appel initial pour démarrer le compte à rebours
+        updateDisplay(); // Afficher la première valeur du compte à rebours
+        const intervalId = setInterval(runCountdown, 1000);
     }
     
-    
-    
+
+
     initializeObstacles() {
         this.addObstacles(NB_OBSTACLES);
     }
-    
+
 
     addObstacles(count) {
         let lastZ = this.obstacles.length > 0 ? this.obstacles[this.obstacles.length - 1].position.z : SPAWN_POS_Z;
@@ -161,12 +159,12 @@ class Game {
                     Scalar.RandomRange(0.5, 1.5),
                     Scalar.RandomRange(0.5, 1.5)
                 );
-    
+
                 let x = Scalar.RandomRange(-TRACK_WIDTH / 2, TRACK_WIDTH / 2);
                 let zGap = Scalar.RandomRange(MIN_Z_GAP, MAX_Z_GAP);
                 let z = lastZ + zGap;
                 lastZ = z;
-    
+
                 let obstacleHeight = 0.3;
                 obstacle.position.set(x, obstacleHeight, z); // Ajuster la hauteur
                 obstacle.checkCollisions = true;
@@ -182,9 +180,9 @@ class Game {
                 // Exemple de mouvement horizontal
                 obstacle.position.x += Math.sin(this.startTimer + obstacle.uniqueId) * 0.05;
             }
-    
+
             obstacle.position.z -= SPEED_Z * delta;
-    
+
             if (obstacle.position.z < 0) {
                 if (!obstacle.touched) {
                     let points = (currentLevel >= 4) ? 1 : 2; // Réduire les points gagnés à partir du niveau 4
@@ -199,7 +197,7 @@ class Game {
                 this.score -= penalty;
                 this.updateScore();
                 this.aie.play();
-    
+
                 if (this.score < 1) {
                     this.endGame();
                     return;
@@ -207,7 +205,7 @@ class Game {
             }
         });
     }
-    
+
 
     resetObstacle(obstacle) {
         let x = Scalar.RandomRange(-TRACK_WIDTH / 2, TRACK_WIDTH / 2);
@@ -216,7 +214,7 @@ class Game {
         obstacle.position.set(x, obstacleHeight, z); // Ajuster la hauteur
         obstacle.touched = false;
     }
-    
+
 
 
     update(delta) {
@@ -257,7 +255,7 @@ class Game {
         this.startTimer += delta;
     }
 
-   
+
 
     updateMoves(delta) {
         if (this.inputMap["KeyA"]) {
@@ -296,7 +294,7 @@ class Game {
             this.showLevelUpMessage(currentLevel); // Afficher le message de niveau sur l'écran
         }
     }
-    
+
 
     showLevelUpMessage(level) {
         // Supposons que vous avez un élément HTML pour afficher les messages
@@ -304,6 +302,56 @@ class Game {
         levelUpDiv.innerText = `Level ${level}!`;
         levelUpDiv.style.display = 'block';
         setTimeout(() => levelUpDiv.style.display = 'none', 3000); // Le message disparaît après 3 secondes
+    }
+
+    // Mise à jour du score
+    updateScore() {
+        this.scoreDisplay.innerText = `Score: ${this.score}`;
+    }
+    // Fonction d'initialisation du HUD
+    initializeHUD() {
+        // Assurez-vous d'avoir un élément `div` avec l'id `scoreDisplay`
+        let hud = document.createElement("div");
+        hud.id = "scoreDisplay";
+        hud.style.position = "fixed";
+        hud.style.top = "10px";
+        hud.style.left = "10px";
+        hud.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+        hud.style.color = "white";
+        hud.style.padding = "10px";
+        document.body.appendChild(hud);
+    }
+
+    endGame() {
+        // Arrêter la boucle de rendu
+        this.engine.stopRenderLoop();
+
+        // Afficher un message de perte
+        let gameOverMessage = document.getElementById("gameOver");
+        if (!gameOverMessage) {
+            gameOverMessage = document.createElement("div");
+            gameOverMessage.id = "gameOver";
+            gameOverMessage.style.position = "fixed";
+            gameOverMessage.style.top = "50%";
+            gameOverMessage.style.left = "50%";
+            gameOverMessage.style.transform = "translate(-50%, -50%)";
+            gameOverMessage.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+            gameOverMessage.style.color = "white";
+            gameOverMessage.style.padding = "20px";
+            gameOverMessage.style.fontSize = "24px";
+            gameOverMessage.style.borderRadius = "10px";
+            gameOverMessage.innerText = "Game Over! Cliquez pour recommencer.";
+            document.body.appendChild(gameOverMessage);
+
+            // Ajouter un écouteur d'événements pour redémarrer le jeu
+            gameOverMessage.addEventListener("click", () => {
+                // Retirer le message de perte
+                document.body.removeChild(gameOverMessage);
+
+                // Réinitialiser le jeu
+                this.resetGame();
+            });
+        }
     }
 
     async createScene() {
@@ -406,62 +454,12 @@ class Game {
         }
     }
 
-    // Mise à jour du score
-    updateScore() {
-        this.scoreDisplay.innerText = `Score: ${this.score}`;
-    }
-    // Fonction d'initialisation du HUD
-    initializeHUD() {
-        // Assurez-vous d'avoir un élément `div` avec l'id `scoreDisplay`
-        let hud = document.createElement("div");
-        hud.id = "scoreDisplay";
-        hud.style.position = "fixed";
-        hud.style.top = "10px";
-        hud.style.left = "10px";
-        hud.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-        hud.style.color = "white";
-        hud.style.padding = "10px";
-        document.body.appendChild(hud);
-    }
-
-    endGame() {
-        // Arrêter la boucle de rendu
-        this.engine.stopRenderLoop();
-    
-        // Afficher un message de perte
-        let gameOverMessage = document.getElementById("gameOver");
-        if (!gameOverMessage) {
-            gameOverMessage = document.createElement("div");
-            gameOverMessage.id = "gameOver";
-            gameOverMessage.style.position = "fixed";
-            gameOverMessage.style.top = "50%";
-            gameOverMessage.style.left = "50%";
-            gameOverMessage.style.transform = "translate(-50%, -50%)";
-            gameOverMessage.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
-            gameOverMessage.style.color = "white";
-            gameOverMessage.style.padding = "20px";
-            gameOverMessage.style.fontSize = "24px";
-            gameOverMessage.style.borderRadius = "10px";
-            gameOverMessage.innerText = "Game Over! Cliquez pour recommencer.";
-            document.body.appendChild(gameOverMessage);
-    
-            // Ajouter un écouteur d'événements pour redémarrer le jeu
-            gameOverMessage.addEventListener("click", () => {
-                // Retirer le message de perte
-                document.body.removeChild(gameOverMessage);
-    
-                // Réinitialiser le jeu
-                this.resetGame();
-            });
-        }
-    }
-    
 
     resetGame() {
         // Réinitialiser le score
         this.score = 0;
         this.updateScore();
-    
+
         // Réinitialiser la position du joueur
         this.player.position.set(0, TRACK_HEIGHT / 2, 6);
         // Reprendre la musique si elle était en pause
@@ -470,11 +468,11 @@ class Game {
         }
 
         // Redémarrer la boucle de rendu si elle n'est pas déjà en cours
-    if (!this.engine.activeRenderLoops.length) {
-        this.start()
+        if (!this.engine.activeRenderLoops.length) {
+            this.start()
+        }
     }
-    }
-    
+
 
 }
 
