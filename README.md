@@ -15,7 +15,7 @@ Pour créer une copie du projet ou le télécharger et le lancer avec npm start,
 2. Assurez-vous d'avoir npm installé sur votre système.
 3. Exécutez `npm install` dans le répertoire du projet pour installer toutes les dépendances.
 4. Lancez le jeu en exécutant `npm start`.
-5. Ouvrez un navigateur web et accédez à l'adresse `http://localhost...`
+5. Ouvrez un navigateur web et accédez à l'adresse `http://localhost:8080/`
 
 ### Contrôles des Jeux
 
@@ -43,6 +43,10 @@ Dans ce jeu, les joueurs contrôlent des pierres de curling pour marquer dans de
 
 **Profitez de notre plateforme interactive qui vous transporte dans un monde de défis sportifs et de stratégies en simulation de curling.**
 
+### Vidéo Globale du Projet
+- **Présentation du Projet :** [Voir la vidéo](./screenshots/BabylonJS.mp4)
+  - Une vue d'ensemble de notre projet, incluant les deux jeux et notre démarche de développement.
+
 ### Captures d'écran
 Pour vous donner un avant-goût de notre expérience interactive, voici quelques captures d'écran de nos jeux :
 
@@ -64,7 +68,7 @@ Le premier jeu met en scène une série de défis sportifs inspirés des Jeux Ol
 - Compatible avec la majorité des navigateurs modernes.
 
 ### Vidéo de Démonstration
-- **Gameplay Complet :** [Voir la vidéo de démo](lien-vers-youtube-premier-jeu)
+- **Gameplay Complet :** [Voir la vidéo de démo](./screenshots/Jeu1.mp4)
 
 ### Captures d'Écran
 ![Capture1](./screenshots/jeu1-1.png) ![Capture2](./screenshots/jeu1-2.png)
@@ -83,7 +87,7 @@ Dans "Soccer: Jeu de Simulation de Curling", exploitez stratégie et précision 
 
 ### Vidéo de Démonstration
 Découvrez "Soccer" en action et voyez comment maîtriser les pierres de curling pour devenir le champion de l'arène :
-- [Voir la vidéo de gameplay pour "Soccer"](lien-vers-youtube-deuxieme-jeu)
+- [Voir la vidéo de gameplay pour "Soccer"](./screenshots/Jeu2.mp4)
 
 ### Captures d'Écran
 ![Capture1](./screenshots/jeu2-1.png) ![Capture2](./screenshots/jeu2-2.png)
@@ -104,3 +108,5 @@ Nous apprécions tous les retours pour améliorer nos jeux. N'hésitez pas à no
 ---
 
 Nous espérons que vous apprécierez jouer à "Au Sommet de l'Excellence" autant que nous avons pris plaisir à le développer !
+
+
