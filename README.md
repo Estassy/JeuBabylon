@@ -38,8 +38,6 @@ Dans ce jeu, les joueurs contrôlent des pierres de curling pour marquer dans de
 
 ---
 
-Avec ces informations, les joueurs auront une référence claire sur la manière de contrôler leurs personnages dans chaque jeu. Cela peut aider à améliorer l'expérience utilisateur et à réduire la confusion lors de la première utilisation du jeu.
-
 **Accédez à notre collection de jeux "Au Sommet de l'Excellence" et jouez directement depuis votre navigateur en cliquant sur le lien suivant :**
 - [**Lancer le Jeu**](https://estassy.github.io/JeuBabylon/)
 
